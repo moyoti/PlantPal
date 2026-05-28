@@ -25,12 +25,11 @@ struct PixelTabBarView: View {
                 .frame(height: 3)
 
             HStack(spacing: 0) {
-                tabItem(tab: .garden, icon: "leaf.fill", label: "花园")
-                tabItem(tab: .habits, icon: "checklist", label: "习惯")
-                tabItem(tab: .collection, icon: "sparkle", label: "收藏")
-                tabItem(tab: .settings, icon: "gearshape.fill", label: "设置")
+                tabItem(tab: .garden, iconName: "tab_garden", label: "花园")
+                tabItem(tab: .collection, iconName: "tab_collection", label: "收藏")
+                tabItem(tab: .settings, iconName: "tab_settings", label: "设置")
             }
-            .frame(height: 64)
+            .frame(height: 56)
             .background(
                 LinearGradient(
                     colors: [PixelPalette.cream, PixelPalette.creamDark],
@@ -45,22 +44,21 @@ struct PixelTabBarView: View {
         }
     }
 
-    private func tabItem(tab: Tab, icon: String, label: String) -> some View {
+    private func tabItem(tab: Tab, iconName: String, label: String) -> some View {
         Button {
             withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                 selectedTab = tab
             }
         } label: {
             VStack(spacing: 4) {
-                Image(systemName: icon)
-                    .font(.system(size: 20, weight: .bold))
-                    .foregroundColor(selectedTab == tab ? PixelPalette.greenDark : PixelPalette.mutedText)
+                PixelArtImage(name: iconName, width: 24, height: 24)
+                    .opacity(selectedTab == tab ? 1.0 : 0.5)
                 Text(label)
                     .font(PixelFonts.header(size: 8))
                     .foregroundColor(selectedTab == tab ? PixelPalette.greenDark : PixelPalette.mutedText)
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 8)
+            .padding(.vertical, 6)
             .background(
                 selectedTab == tab
                     ? PixelPalette.greenPrimary.opacity(0.2)
@@ -71,7 +69,7 @@ struct PixelTabBarView: View {
                     ? Rectangle()
                         .fill(PixelPalette.greenDark)
                         .frame(height: 3)
-                        .offset(y: -28)
+                        .offset(y: -23)
                     : nil
             )
             .scaleEffect(selectedTab == tab ? 1.08 : 1.0)

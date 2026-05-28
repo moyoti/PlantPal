@@ -404,23 +404,12 @@ struct GardenView: View {
         }
     }
     
-private func checkAndScheduleReminders(plant: Plant) {
-        let previousStage = plant.growthStage
-        
-        if plant.waterLevel < 0.3 && previousStage != .seededStage {
- {
+    private func checkAndScheduleReminders(plant: Plant) {
+        if plant.waterLevel < 0.3 {
             NotificationManager.shared.scheduleWaterReminder(plantName: plant.name, intervalHours: 4)
         }
-        
         if plant.lightLevel < 0.3 {
- previousStage != .seed(Stage) {
             NotificationManager.shared.scheduleLightReminder(plantName: plant.name)
-        }
-    }
-        if plant.lightLevel < 0.3 {
-            nm.scheduleLightReminder(plantName: plant.name)
-        } else {
-            nm.cancelReminder(identifier: "light_reminder")
         }
     }
     
