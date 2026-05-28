@@ -1,0 +1,44 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Xcode
+ios/PlantPal/PlantPal.xcodeproj/
+ios/PlantPal/PlantPal.xcworkspace/
+ios/PlantPal/xcuserdata/
+ios/PlantPal/build/
+ios/PlantPal/DerivedData/
+*.xcuserstate
+*.xcscmblueprint
+
+# Android
+android/.gradle/
+android/app/build/
+android/build/
+android/local.properties
+*.apk
+*.aab
+
+# Swift Package Manager
+.build/
+.swiftpm/
+
+# General
+*.log
+*.tmp
+.env
+.env.*
+credentials.json
+secrets/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Generated
+shared/sprites/generated/__pycache__/
+__pycache__/
+*.pyc

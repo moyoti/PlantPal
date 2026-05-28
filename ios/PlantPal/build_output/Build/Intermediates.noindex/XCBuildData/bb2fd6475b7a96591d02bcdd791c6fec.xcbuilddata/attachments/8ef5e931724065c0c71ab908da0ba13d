@@ -1,0 +1,139 @@
+{
+  "" : {
+    "diagnostics" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/PlantPal-primary.dia",
+    "emit-module-dependencies" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/PlantPal-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/PlantPal-primary-emit-module.dia",
+    "pch" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/PlantPal-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/PlantPal-primary.swiftdeps"
+  },
+  "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/PlantPal/App/PlantPalApp.swift" : {
+    "const-values" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/PlantPalApp.swiftconstvalues",
+    "dependencies" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/PlantPalApp.d",
+    "diagnostics" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/PlantPalApp.dia",
+    "index-unit-output-path" : "/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/PlantPalApp.o",
+    "llvm-bc" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/PlantPalApp.bc",
+    "object" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/PlantPalApp.o",
+    "swift-dependencies" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/PlantPalApp.swiftdeps",
+    "swiftmodule" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/PlantPalApp~partial.swiftmodule"
+  },
+  "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/PlantPal/Models/Decoration.swift" : {
+    "const-values" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/Decoration.swiftconstvalues",
+    "dependencies" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/Decoration.d",
+    "diagnostics" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/Decoration.dia",
+    "index-unit-output-path" : "/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/Decoration.o",
+    "llvm-bc" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/Decoration.bc",
+    "object" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/Decoration.o",
+    "swift-dependencies" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/Decoration.swiftdeps",
+    "swiftmodule" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/Decoration~partial.swiftmodule"
+  },
+  "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/PlantPal/Models/Models.swift" : {
+    "const-values" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/Models.swiftconstvalues",
+    "dependencies" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/Models.d",
+    "diagnostics" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/Models.dia",
+    "index-unit-output-path" : "/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/Models.o",
+    "llvm-bc" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/Models.bc",
+    "object" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/Models.o",
+    "swift-dependencies" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/Models.swiftdeps",
+    "swiftmodule" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/Models~partial.swiftmodule"
+  },
+  "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/PlantPal/Services/EdgeCaseHandler.swift" : {
+    "const-values" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/EdgeCaseHandler.swiftconstvalues",
+    "dependencies" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/EdgeCaseHandler.d",
+    "diagnostics" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/EdgeCaseHandler.dia",
+    "index-unit-output-path" : "/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/EdgeCaseHandler.o",
+    "llvm-bc" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/EdgeCaseHandler.bc",
+    "object" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/EdgeCaseHandler.o",
+    "swift-dependencies" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/EdgeCaseHandler.swiftdeps",
+    "swiftmodule" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/EdgeCaseHandler~partial.swiftmodule"
+  },
+  "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/PlantPal/Services/NotificationManager.swift" : {
+    "const-values" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/NotificationManager.swiftconstvalues",
+    "dependencies" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/NotificationManager.d",
+    "diagnostics" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/NotificationManager.dia",
+    "index-unit-output-path" : "/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/NotificationManager.o",
+    "llvm-bc" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/NotificationManager.bc",
+    "object" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/NotificationManager.o",
+    "swift-dependencies" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/NotificationManager.swiftdeps",
+    "swiftmodule" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/NotificationManager~partial.swiftmodule"
+  },
+  "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/PlantPal/Services/TimeEngine.swift" : {
+    "const-values" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/TimeEngine.swiftconstvalues",
+    "dependencies" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/TimeEngine.d",
+    "diagnostics" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/TimeEngine.dia",
+    "index-unit-output-path" : "/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/TimeEngine.o",
+    "llvm-bc" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/TimeEngine.bc",
+    "object" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/TimeEngine.o",
+    "swift-dependencies" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/TimeEngine.swiftdeps",
+    "swiftmodule" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/TimeEngine~partial.swiftmodule"
+  },
+  "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/PlantPal/Views/Collection/CollectionView.swift" : {
+    "const-values" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/CollectionView.swiftconstvalues",
+    "dependencies" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/CollectionView.d",
+    "diagnostics" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/CollectionView.dia",
+    "index-unit-output-path" : "/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/CollectionView.o",
+    "llvm-bc" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/CollectionView.bc",
+    "object" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/CollectionView.o",
+    "swift-dependencies" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/CollectionView.swiftdeps",
+    "swiftmodule" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/CollectionView~partial.swiftmodule"
+  },
+  "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/PlantPal/Views/Collection/DecorationStoreView.swift" : {
+    "const-values" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/DecorationStoreView.swiftconstvalues",
+    "dependencies" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/DecorationStoreView.d",
+    "diagnostics" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/DecorationStoreView.dia",
+    "index-unit-output-path" : "/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/DecorationStoreView.o",
+    "llvm-bc" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/DecorationStoreView.bc",
+    "object" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/DecorationStoreView.o",
+    "swift-dependencies" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/DecorationStoreView.swiftdeps",
+    "swiftmodule" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/DecorationStoreView~partial.swiftmodule"
+  },
+  "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/PlantPal/Views/Garden/GardenView.swift" : {
+    "const-values" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/GardenView.swiftconstvalues",
+    "dependencies" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/GardenView.d",
+    "diagnostics" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/GardenView.dia",
+    "index-unit-output-path" : "/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/GardenView.o",
+    "llvm-bc" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/GardenView.bc",
+    "object" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/GardenView.o",
+    "swift-dependencies" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/GardenView.swiftdeps",
+    "swiftmodule" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/GardenView~partial.swiftmodule"
+  },
+  "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/PlantPal/Views/Habits/HabitsView.swift" : {
+    "const-values" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/HabitsView.swiftconstvalues",
+    "dependencies" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/HabitsView.d",
+    "diagnostics" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/HabitsView.dia",
+    "index-unit-output-path" : "/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/HabitsView.o",
+    "llvm-bc" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/HabitsView.bc",
+    "object" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/HabitsView.o",
+    "swift-dependencies" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/HabitsView.swiftdeps",
+    "swiftmodule" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/HabitsView~partial.swiftmodule"
+  },
+  "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/PlantPal/Views/Settings/SettingsView.swift" : {
+    "const-values" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/SettingsView.swiftconstvalues",
+    "dependencies" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/SettingsView.d",
+    "diagnostics" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/SettingsView.dia",
+    "index-unit-output-path" : "/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/SettingsView.o",
+    "llvm-bc" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/SettingsView.bc",
+    "object" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/SettingsView.o",
+    "swift-dependencies" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/SettingsView.swiftdeps",
+    "swiftmodule" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/SettingsView~partial.swiftmodule"
+  },
+  "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/PlantPal/Views/Shared/Animations.swift" : {
+    "const-values" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/Animations.swiftconstvalues",
+    "dependencies" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/Animations.d",
+    "diagnostics" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/Animations.dia",
+    "index-unit-output-path" : "/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/Animations.o",
+    "llvm-bc" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/Animations.bc",
+    "object" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/Animations.o",
+    "swift-dependencies" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/Animations.swiftdeps",
+    "swiftmodule" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/Animations~partial.swiftmodule"
+  },
+  "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/DerivedSources/GeneratedAssetSymbols.swift" : {
+    "const-values" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/GeneratedAssetSymbols.swiftconstvalues",
+    "dependencies" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/GeneratedAssetSymbols.d",
+    "diagnostics" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/GeneratedAssetSymbols.dia",
+    "index-unit-output-path" : "/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/GeneratedAssetSymbols.o",
+    "llvm-bc" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/GeneratedAssetSymbols.bc",
+    "object" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/GeneratedAssetSymbols.o",
+    "swift-dependencies" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/GeneratedAssetSymbols.swiftdeps",
+    "swiftmodule" : "/Users/jenkins3/Documents/dqh/AIGenPrj/ios/PlantPal/build_output/Build/Intermediates.noindex/PlantPal.build/Debug-iphonesimulator/PlantPal.build/Objects-normal/arm64/GeneratedAssetSymbols~partial.swiftmodule"
+  }
+}

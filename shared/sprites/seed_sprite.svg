@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 32 32" shape-rendering="crispEdges">
+  <!-- Seed Sprite - Frame 1 (Idle) -->
+  <g transform="translate(0,0)">
+    <!-- Body orb -->
+    <rect x="12" y="10" width="8" height="8" fill="#66BB6A"/>
+    <rect x="11" y="11" width="10" height="6" fill="#66BB6A"/>
+    <rect x="12" y="9" width="8" height="1" fill="#81C784"/>
+    <rect x="11" y="10" width="1" height="8" fill="#81C784"/>
+    <rect x="20" y="10" width="1" height="8" fill="#81C784"/>
+    <!-- Eyes -->
+    <rect x="13" y="12" width="2" height="2" fill="#1B5E20"/>
+    <rect x="17" y="12" width="2" height="2" fill="#1B5E20"/>
+    <!-- Eye shine -->
+    <rect x="14" y="12" width="1" height="1" fill="#FFFFFF"/>
+    <rect x="18" y="12" width="1" height="1" fill="#FFFFFF"/>
+    <!-- Smile -->
+    <rect x="14" y="15" width="4" height="1" fill="#2E7D32"/>
+    <!-- Sparkle -->
+    <rect x="22" y="8" width="1" height="1" fill="#FFD54F"/>
+    <rect x="21" y="7" width="1" height="1" fill="#FFF9C4"/>
+  </g>
+
+  <!-- Seed Sprite - Frame 2 (Idle blink) -->
+  <g transform="translate(0,0)" opacity="0">
+    <rect x="12" y="10" width="8" height="8" fill="#66BB6A"/>
+    <rect x="11" y="11" width="10" height="6" fill="#66BB6A"/>
+    <rect x="12" y="9" width="8" height="1" fill="#81C784"/>
+    <!-- Eyes closed -->
+    <rect x="13" y="13" width="2" height="1" fill="#1B5E20"/>
+    <rect x="17" y="13" width="2" height="1" fill="#1B5E20"/>
+    <!-- Smile -->
+    <rect x="14" y="15" width="4" height="1" fill="#2E7D32"/>
+  </g>
+
+  <!-- Seed Sprite - Frame 3 (Happy bounce up) -->
+  <g transform="translate(0,0)" opacity="0">
+    <rect x="12" y="8" width="8" height="8" fill="#66BB6A"/>
+    <rect x="11" y="9" width="10" height="6" fill="#66BB6A"/>
+    <rect x="12" y="7" width="8" height="1" fill="#81C784"/>
+    <!-- Happy eyes (^_^) -->
+    <rect x="13" y="11" width="2" height="1" fill="#1B5E20"/>
+    <rect x="17" y="11" width="2" height="1" fill="#1B5E20"/>
+    <!-- Big smile -->
+    <rect x="13" y="13" width="6" height="1" fill="#2E7D32"/>
+    <rect x="14" y="14" width="4" height="1" fill="#2E7D32"/>
+    <!-- Sparkles -->
+    <rect x="9" y="8" width="1" height="1" fill="#FFD54F"/>
+    <rect x="22" y="6" width="1" height="1" fill="#FFD54F"/>
+  </g>
+
+  <!-- Seed Sprite - Frame 4 (Happy bounce down) -->
+  <g transform="translate(0,0)" opacity="0">
+    <rect x="12" y="12" width="8" height="8" fill="#66BB6A"/>
+    <rect x="11" y="13" width="10" height="6" fill="#66BB6A"/>
+    <rect x="12" y="11" width="8" height="1" fill="#81C784"/>
+    <!-- Happy eyes -->
+    <rect x="13" y="14" width="2" height="1" fill="#1B5E20"/>
+    <rect x="17" y="14" width="2" height="1" fill="#1B5E20"/>
+    <!-- Big smile -->
+    <rect x="13" y="17" width="6" height="1" fill="#2E7D32"/>
+    <!-- Sparkles -->
+    <rect x="9" y="10" width="1" height="1" fill="#FFD54F"/>
+    <rect x="22" y="8" width="1" height="1" fill="#FFD54F"/>
+  </g>
+</svg>

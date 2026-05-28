@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">PlantPal</string>
+    <string name="tab_garden">花园</string>
+    <string name="tab_habits">习惯</string>
+    <string name="tab_collection">收藏</string>
+    <string name="tab_settings">设置</string>
+    <string name="widget_description">PlantPal桌面宠物小部件</string>
+</resources>

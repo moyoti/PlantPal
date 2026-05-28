@@ -1,0 +1,72 @@
+name: PlantPal
+options:
+  bundleIdPrefix: com.plantpal
+  deploymentTarget:
+    iOS: "18.0"
+  xcodeVersion: "16.0"
+  generateEmptyDirectories: true
+  groupSortPosition: top
+
+settings:
+    base:
+      SWIFT_VERSION: "5.0"
+      IPHONEOS_DEPLOYMENT_TARGET: "18.0"
+      CODE_SIGN_IDENTITY: "Apple Development"
+      DEVELOPMENT_TEAM: K4XY2L6L95
+
+targets:
+  PlantPal:
+    type: application
+    platform: iOS
+    sources:
+      - path: PlantPal
+        excludes:
+          - "**/.DS_Store"
+          - "Info.plist"
+    resources:
+      - path: PlantPal/Resources
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.plantpal.app
+        INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
+        INFOPLIST_KEY_UIApplicationSupportsMultipleScenes: NO
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_CFBundleDevelopmentRegion: zh-Hans
+        CODE_SIGN_ENTITLEMENTS: PlantPal/PlantPal.entitlements
+        CODE_SIGN_IDENTITY: "Apple Development"
+        DEVELOPMENT_TEAM: K4XY2L6L95
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        GENERATE_INFOPLIST_FILE: YES
+        MARKETING_VERSION: "1.0"
+        CURRENT_PROJECT_VERSION: "1"
+    entitlements:
+      path: PlantPal/PlantPal.entitlements
+      properties:
+        com.apple.security.app-sandbox: false
+
+  PlantPalWidget:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: PlantPalWidget
+        excludes:
+          - "**/.DS_Store"
+          - "Info.plist"
+      - path: PlantPal/Models/Models.swift
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.plantpal.app.PlantPalWidget
+        INFOPLIST_KEY_CFBundleDisplayName: "PlantPal Widget"
+        INFOPLIST_KEY_NSExtension_NSExtensionPointIdentifier: com.apple.widgetkit-extension
+        CODE_SIGN_ENTITLEMENTS: PlantPalWidget/PlantPalWidget.entitlements
+        CODE_SIGN_IDENTITY: "Apple Development"
+        DEVELOPMENT_TEAM: K4XY2L6L95
+        GENERATE_INFOPLIST_FILE: YES
+        MARKETING_VERSION: "1.0"
+        CURRENT_PROJECT_VERSION: "1"
+    entitlements:
+      path: PlantPalWidget/PlantPalWidget.entitlements
+      properties:
+        com.apple.security.app-sandbox: false
+    dependencies:
+      - target: PlantPal

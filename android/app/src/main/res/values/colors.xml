@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="app_primary">#4CAF50</color>
+    <color name="app_primary_dark">#2E7D32</color>
+    <color name="app_accent">#FF9800</color>
+    <color name="app_background">#F5F5DC</color>
+    <color name="app_surface">#FFFFFF</color>
+    <color name="plant_water">#42A5F5</color>
+    <color name="plant_sunlight">#FFD54F</color>
+    <color name="plant_health">#66BB6A</color>
+    <color name="plant_nutrients">#8D6E63</color>
+</resources>
