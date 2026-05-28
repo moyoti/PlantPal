@@ -1,5 +1,6 @@
 package com.plantpal.ui.screens
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -11,6 +12,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -178,7 +181,11 @@ private fun RowScope.InteractionBtn(type: InteractionType, cooldownState: TimeEn
             }
         } else {
             Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                Text(type.icon, fontSize = 16.sp)
+                val context = LocalContext.current
+                val resId = context.resources.getIdentifier(type.icon, "drawable", context.packageName)
+                if (resId != 0) {
+                    Image(painter = painterResource(id = resId), contentDescription = type.displayName, modifier = Modifier.size(24.dp))
+                }
                 Text(type.displayName, fontSize = 7.sp, color = PixelPalette.darkText)
             }
         }

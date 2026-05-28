@@ -197,17 +197,17 @@ enum InteractionType: String, Codable {
     
     var icon: String {
         switch self {
-        case .water: return "drop.fill"
-        case .light: return "sun.max.fill"
-        case .fertilize: return "leaf.fill"
-        case .touch: return "hand.raised.fill"
-        case .talk: return "bubble.left.fill"
-        case .sing: return "music.note"
-        case .heal: return "cross.case.fill"
-        case .play: return "gamecontroller.fill"
-        case .shield: return "shield.fill"
-        case .dance: return "figure.dance"
-        case .pet: return "hand.draw.fill"
+        case .water: return "icon_water"
+        case .light: return "icon_light"
+        case .fertilize: return "icon_fertilize"
+        case .touch: return "icon_touch"
+        case .talk: return "icon_talk"
+        case .sing: return "icon_sing"
+        case .heal: return "icon_heal"
+        case .play: return "icon_play"
+        case .shield: return "icon_shield"
+        case .dance: return "icon_dance"
+        case .pet: return "icon_pet"
         }
     }
     

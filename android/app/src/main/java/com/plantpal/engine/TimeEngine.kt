@@ -117,50 +117,58 @@ class TimeEngine {
         var s = sprite
         var w = wallet
 
-        val penalty = 1.0 - s.fatigue * 0.75
+        val fatiguePenalty = 1.0 - s.fatigue * 0.75
+        val moodMultiplier = when (s.mood) {
+            SpriteMood.EXCITED -> 1.25
+            SpriteMood.HAPPY -> 1.0
+            SpriteMood.WORRIED -> 0.8
+            SpriteMood.SAD -> 0.6
+            SpriteMood.SLEEPING -> 1.0
+        }
+        val effect = fatiguePenalty * moodMultiplier
 
         when (type) {
             InteractionType.WATER -> {
-                p = p.copy(waterLevel = (p.waterLevel + 0.3 * penalty).coerceIn(0.0, 1.0))
+                p = p.copy(waterLevel = (p.waterLevel + 0.3 * effect).coerceIn(0.0, 1.0))
                 w = w?.copy(coins = w.coins + 1)
             }
             InteractionType.LIGHT -> {
-                p = p.copy(lightLevel = (p.lightLevel + 0.3 * penalty).coerceIn(0.0, 1.0))
+                p = p.copy(lightLevel = (p.lightLevel + 0.3 * effect).coerceIn(0.0, 1.0))
                 w = w?.copy(coins = w.coins + 1)
             }
             InteractionType.FERTILIZE -> {
-                if (p.nutrients >= 5) p = p.copy(nutrients = p.nutrients - 5, growthProgress = (p.growthProgress + 0.05 * penalty).coerceIn(0.0, 1.0))
+                if (p.nutrients >= 5) p = p.copy(nutrients = p.nutrients - 5, growthProgress = (p.growthProgress + 0.05 * effect).coerceIn(0.0, 1.0))
                 w = w?.copy(coins = w.coins + 1)
             }
             InteractionType.TOUCH -> {
-                s = s.copy(happiness = (s.happiness + 0.1 * penalty).coerceIn(0.0, 1.0), interactionCount = s.interactionCount + 1)
+                s = s.copy(happiness = (s.happiness + 0.1 * effect).coerceIn(0.0, 1.0), interactionCount = s.interactionCount + 1)
                 w = w?.copy(coins = w.coins + 2)
             }
             InteractionType.TALK -> {
-                s = s.copy(happiness = (s.happiness + 0.05 * penalty).coerceIn(0.0, 1.0), interactionCount = s.interactionCount + 1)
+                s = s.copy(happiness = (s.happiness + 0.05 * effect).coerceIn(0.0, 1.0), interactionCount = s.interactionCount + 1)
                 w = w?.copy(coins = w.coins + 2)
             }
             InteractionType.SING -> {
-                s = s.copy(happiness = (s.happiness + 0.15 * penalty).coerceIn(0.0, 1.0), interactionCount = s.interactionCount + 2, fatigue = (s.fatigue + 0.05).coerceIn(0.0, 1.0))
+                s = s.copy(happiness = (s.happiness + 0.15 * effect).coerceIn(0.0, 1.0), interactionCount = s.interactionCount + 2, fatigue = (s.fatigue + 0.05).coerceIn(0.0, 1.0))
                 w = w?.copy(coins = w.coins + 3)
             }
             InteractionType.HEAL -> {
-                if (p.isSick) { p = p.copy(isSick = false, health = (p.health + 0.4 * penalty).coerceIn(0.0, 1.0)) }
-                else { p = p.copy(health = (p.health + 0.1 * penalty).coerceIn(0.0, 1.0)) }
+                if (p.isSick) { p = p.copy(isSick = false, health = (p.health + 0.4 * effect).coerceIn(0.0, 1.0)) }
+                else { p = p.copy(health = (p.health + 0.1 * effect).coerceIn(0.0, 1.0)) }
                 w = w?.copy(coins = w.coins + 2)
             }
             InteractionType.PLAY -> {
-                s = s.copy(happiness = (s.happiness + 0.12 * penalty).coerceIn(0.0, 1.0), interactionCount = s.interactionCount + 3, fatigue = (s.fatigue + 0.08).coerceIn(0.0, 1.0))
+                s = s.copy(happiness = (s.happiness + 0.12 * effect).coerceIn(0.0, 1.0), interactionCount = s.interactionCount + 3, fatigue = (s.fatigue + 0.08).coerceIn(0.0, 1.0))
                 w = w?.copy(coins = w.coins + 3)
             }
             InteractionType.SHIELD -> {
-                p = p.copy(shieldedUntil = now + (3600000L * penalty).toLong())
-                s = s.copy(happiness = (s.happiness + 0.05 * penalty).coerceIn(0.0, 1.0))
+                p = p.copy(shieldedUntil = now + (3600000L * effect).toLong())
+                s = s.copy(happiness = (s.happiness + 0.05 * effect).coerceIn(0.0, 1.0))
                 w = w?.copy(coins = w.coins + 4)
             }
             InteractionType.DANCE -> {
-                s = s.copy(happiness = (s.happiness + 0.2 * penalty).coerceIn(0.0, 1.0), interactionCount = s.interactionCount + 2, fatigue = (s.fatigue + 0.06).coerceIn(0.0, 1.0))
-                p = p.copy(growthProgress = (p.growthProgress + 0.02 * penalty).coerceIn(0.0, 1.0))
+                s = s.copy(happiness = (s.happiness + 0.2 * effect).coerceIn(0.0, 1.0), interactionCount = s.interactionCount + 2, fatigue = (s.fatigue + 0.06).coerceIn(0.0, 1.0))
+                p = p.copy(growthProgress = (p.growthProgress + 0.02 * effect).coerceIn(0.0, 1.0))
                 w = w?.copy(coins = w.coins + 4)
             }
             InteractionType.PET -> {

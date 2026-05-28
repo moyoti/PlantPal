@@ -255,8 +255,7 @@ struct GardenView: View {
                     }
                 } label: {
                     HStack(spacing: 3) {
-                        Image(systemName: tab == .care ? "leaf.fill" : "heart.fill")
-                            .font(.system(size: 9))
+                    PixelArtImage(name: tab == .care ? "icon_fertilize" : "icon_touch", size: .icon)
                         Text(tab.rawValue)
                             .font(PixelFonts.header(size: 8))
                     }
@@ -322,9 +321,8 @@ struct GardenView: View {
                                 .stroke(btnColor.opacity(onCooldown ? 0.15 : 0.4), lineWidth: onCooldown ? 1 : 2)
                         )
                     
-                    Image(systemName: type.icon)
-                        .font(.system(size: 16))
-                        .foregroundColor(onCooldown ? PixelPalette.mutedText : btnColor)
+                    PixelArtImage(name: type.icon, size: .icon)
+                        .opacity(onCooldown ? 0.3 : 1.0)
                     
                     if onCooldown {
                         RoundedRectangle(cornerRadius: 4)

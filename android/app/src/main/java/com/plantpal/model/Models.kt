@@ -120,17 +120,17 @@ enum class InteractionType {
 
     val icon: String
         get() = when (this) {
-            WATER -> "💧"
-            LIGHT -> "☀️"
-            FERTILIZE -> "🍃"
-            TOUCH -> "✋"
-            TALK -> "💬"
-            SING -> "🎵"
-            HEAL -> "✚"
-            PLAY -> "🎮"
-            SHIELD -> "🛡"
-            DANCE -> "💃"
-            PET -> "🖌"
+            WATER -> "icon_water"
+            LIGHT -> "icon_light"
+            FERTILIZE -> "icon_fertilize"
+            TOUCH -> "icon_touch"
+            TALK -> "icon_talk"
+            SING -> "icon_sing"
+            HEAL -> "icon_heal"
+            PLAY -> "icon_play"
+            SHIELD -> "icon_shield"
+            DANCE -> "icon_dance"
+            PET -> "icon_pet"
         }
 
     val cooldownSeconds: Double
