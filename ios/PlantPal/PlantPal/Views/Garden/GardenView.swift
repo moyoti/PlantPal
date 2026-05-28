@@ -64,6 +64,7 @@ struct GardenView: View {
             ensureDefaultData()
             if let plant, let sprite {
                 timeEngine.calculateTimeEffects(plant: plant, sprite: sprite, wallet: wallet)
+                checkAndScheduleReminders(plant: plant)
             }
             startAmbientAnimations()
         }
@@ -400,6 +401,26 @@ struct GardenView: View {
         case .worried: return PixelPalette.orangeWarn
         case .sad: return PixelPalette.redDanger
         case .sleeping: return PixelPalette.purpleNight
+        }
+    }
+    
+private func checkAndScheduleReminders(plant: Plant) {
+        let previousStage = plant.growthStage
+        
+        if plant.waterLevel < 0.3 && previousStage != .seededStage {
+ {
+            NotificationManager.shared.scheduleWaterReminder(plantName: plant.name, intervalHours: 4)
+        }
+        
+        if plant.lightLevel < 0.3 {
+ previousStage != .seed(Stage) {
+            NotificationManager.shared.scheduleLightReminder(plantName: plant.name)
+        }
+    }
+        if plant.lightLevel < 0.3 {
+            nm.scheduleLightReminder(plantName: plant.name)
+        } else {
+            nm.cancelReminder(identifier: "light_reminder")
         }
     }
     

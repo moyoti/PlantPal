@@ -40,6 +40,9 @@ final class TimeEngine {
         }
         
         if plant.waterLevel < 0.2 && plant.lightLevel < 0.2 && !isShielded {
+            if !plant.isSick {
+                NotificationManager.shared.scheduleSicknessAlert(plantName: plant.name)
+            }
             plant.isSick = true
         }
         
@@ -72,6 +75,7 @@ final class TimeEngine {
                         plant.growthProgress = 0
                         sprite.mood = .excited
                         wallet?.coins += 5
+                        NotificationManager.shared.sendEvolutionCelebration(plantName: plant.name, newStage: next.displayName)
                     }
                 }
             }
@@ -82,6 +86,7 @@ final class TimeEngine {
             sprite.evolutionLevel = newLevel
             sprite.mood = .excited
             wallet?.coins += 10
+            NotificationManager.shared.sendSpriteEvolutionCelebration(spriteName: sprite.name, newLevel: newLevel)
         }
         
         sprite.fatigue = max(0, sprite.fatigue - 0.1 * elapsedHours)

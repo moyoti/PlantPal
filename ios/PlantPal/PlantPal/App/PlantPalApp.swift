@@ -5,6 +5,12 @@ import SwiftData
 struct PlantPalApp: App {
     @State private var selectedTab: Tab = .garden
     
+    init() {
+        Task {
+            _ = await NotificationManager.shared.requestAuthorization()
+        }
+    }
+    
     var body: some Scene {
         WindowGroup {
             PixelTabBarView(selectedTab: $selectedTab) {
