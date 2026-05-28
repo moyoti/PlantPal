@@ -84,7 +84,7 @@ final class TimeEngine {
             wallet?.coins += 10
         }
         
-        sprite.fatigue = max(0, sprite.fatigue - 0.02 * elapsedHours)
+        sprite.fatigue = max(0, sprite.fatigue - 0.1 * elapsedHours)
         
         deriveSpriteMood(sprite: sprite, plant: plant, now: now)
         
@@ -98,65 +98,67 @@ final class TimeEngine {
         guard !cooldownState.isOnCooldown(type: type, now: now) else { return }
         cooldownState.markUsed(type: type, now: now)
         
+        let penalty = 1.0 - sprite.fatigue * 0.75
+        
         switch type {
         case .water:
-            plant.waterLevel = min(1, plant.waterLevel + 0.3)
+            plant.waterLevel = min(1, plant.waterLevel + 0.3 * penalty)
             plant.lastWateredAt = now
             wallet?.coins += 1
             
         case .light:
-            plant.lightLevel = min(1, plant.lightLevel + 0.3)
+            plant.lightLevel = min(1, plant.lightLevel + 0.3 * penalty)
             plant.lastLightAt = now
             wallet?.coins += 1
             
         case .fertilize:
             if plant.nutrients >= 5 {
                 plant.nutrients -= 5
-                plant.growthProgress = min(1, plant.growthProgress + 0.05)
+                plant.growthProgress = min(1, plant.growthProgress + 0.05 * penalty)
             }
             wallet?.coins += 1
             
         case .touch:
-            sprite.happiness = min(1, sprite.happiness + 0.1)
+            sprite.happiness = min(1, sprite.happiness + 0.1 * penalty)
             sprite.interactionCount += 1
             wallet?.coins += 2
             
         case .talk:
-            sprite.happiness = min(1, sprite.happiness + 0.05)
+            sprite.happiness = min(1, sprite.happiness + 0.05 * penalty)
             sprite.interactionCount += 1
             wallet?.coins += 2
             
         case .sing:
-            sprite.happiness = min(1, sprite.happiness + 0.15)
+            sprite.happiness = min(1, sprite.happiness + 0.15 * penalty)
             sprite.interactionCount += 2
-            sprite.fatigue = min(1, sprite.fatigue + 0.1)
+            sprite.fatigue = min(1, sprite.fatigue + 0.05)
             wallet?.coins += 3
             
         case .heal:
             if plant.isSick {
                 plant.isSick = false
-                plant.health = min(1, plant.health + 0.4)
+                plant.health = min(1, plant.health + 0.4 * penalty)
             } else {
-                plant.health = min(1, plant.health + 0.1)
+                plant.health = min(1, plant.health + 0.1 * penalty)
             }
             wallet?.coins += 2
             
         case .play:
-            sprite.happiness = min(1, sprite.happiness + 0.12)
+            sprite.happiness = min(1, sprite.happiness + 0.12 * penalty)
             sprite.interactionCount += 3
-            sprite.fatigue = min(1, sprite.fatigue + 0.15)
+            sprite.fatigue = min(1, sprite.fatigue + 0.08)
             wallet?.coins += 3
             
         case .shield:
-            plant.shieldedUntil = now + 3600
-            sprite.happiness = min(1, sprite.happiness + 0.05)
+            plant.shieldedUntil = now + 3600.0 * penalty
+            sprite.happiness = min(1, sprite.happiness + 0.05 * penalty)
             wallet?.coins += 4
             
         case .dance:
-            sprite.happiness = min(1, sprite.happiness + 0.2)
+            sprite.happiness = min(1, sprite.happiness + 0.2 * penalty)
             sprite.interactionCount += 2
-            sprite.fatigue = min(1, sprite.fatigue + 0.12)
-            plant.growthProgress = min(1, plant.growthProgress + 0.02)
+            sprite.fatigue = min(1, sprite.fatigue + 0.06)
+            plant.growthProgress = min(1, plant.growthProgress + 0.02 * penalty)
             wallet?.coins += 4
             
         case .pet:

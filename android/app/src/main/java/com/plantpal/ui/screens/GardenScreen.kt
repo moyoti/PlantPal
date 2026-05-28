@@ -88,11 +88,14 @@ fun GardenScreen(
             if (plant.isSick) StatusBadge("生病", PixelPalette.redDanger)
             if (System.currentTimeMillis() < plant.shieldedUntil) StatusBadge("护盾", PixelPalette.blueWater)
             Spacer(Modifier.weight(1f))
-            if (sprite.fatigue > 0.3) {
+            if (sprite.fatigue > 0.5) {
                 Row(horizontalArrangement = Arrangement.spacedBy(1.dp)) {
                     Text("疲惫", fontSize = 6.sp, color = PixelPalette.orangeWarnFix)
                     Box(Modifier.width(20.dp).height(4.dp).background(PixelPalette.orangeWarnFix.copy(alpha = 0.3f))) {
                         Box(Modifier.width((20 * sprite.fatigue.coerceIn(0.0, 1.0)).dp).height(4.dp).background(PixelPalette.orangeWarnFix))
+                    }
+                    if (sprite.fatigue > 0.6) {
+                        Text("↓", fontSize = 6.sp, color = PixelPalette.redDanger)
                     }
                 }
             }

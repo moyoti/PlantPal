@@ -119,7 +119,7 @@ struct GardenView: View {
             
             Spacer()
             
-            if sprite.fatigue > 0.3 {
+            if sprite.fatigue > 0.5 {
                 HStack(spacing: 1) {
                     Text("疲惫")
                         .font(PixelFonts.header(size: 6))
@@ -131,6 +131,11 @@ struct GardenView: View {
                             Rectangle().fill(PixelPalette.orangeWarn)
                                 .frame(width: 20 * min(sprite.fatigue, 1.0), height: 4)
                         )
+                    if sprite.fatigue > 0.6 {
+                        Text("↓")
+                            .font(PixelFonts.header(size: 6))
+                            .foregroundColor(PixelPalette.redDanger)
+                    }
                 }
             }
         }
