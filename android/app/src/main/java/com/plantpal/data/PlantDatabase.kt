@@ -22,7 +22,7 @@ import com.plantpal.data.entity.PlayerWalletEntity
         InteractionEntity::class,
         PlayerWalletEntity::class
     ],
-    version = 2,
+    version = 1,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
