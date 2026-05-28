@@ -20,6 +20,7 @@ android/build/
 android/local.properties
 *.apk
 *.aab
+*.hprof
 
 # Swift Package Manager
 .build/
