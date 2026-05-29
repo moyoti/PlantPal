@@ -191,6 +191,7 @@ private fun BoxScope.TopOverlay(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(sprite.name, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                    Text(plant.currentWeather.emoji, fontSize = 14.sp)
                     MoodBadge(sprite.mood)
                     if (plant.isSick) StatusBadge("生病", PixelPalette.redDanger)
                     if (System.currentTimeMillis() < plant.shieldedUntil) StatusBadge("护盾", PixelPalette.blueWater)

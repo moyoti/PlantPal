@@ -9,6 +9,7 @@ struct GardenView: View {
     @Query private var wallets: [PlayerWallet]
     @Query private var dailyLogins: [DailyLogin]
     @Query private var pets: [Pet]
+    @Query private var achievementRecords: [AchievementRecord]
     @State private var timeEngine = TimeEngine()
     @State private var activeEffect: InteractionType?
     @State private var cloudOffset: CGFloat = 0
@@ -286,6 +287,7 @@ struct GardenView: View {
             guard !onCooldown else { return }
             timeEngine.applyInteraction(plant: plant, sprite: sprite, type: type, wallet: wallet)
             updateCooldowns()
+            checkAndUnlockAchievements(plant: plant, sprite: sprite)
             activeEffect = type
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) { activeEffect = nil }
         }) {
@@ -513,6 +515,26 @@ struct GardenView: View {
             withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
                 dailyLoginReward = reward
             }
+        }
+    }
+
+    private func checkAndUnlockAchievements(plant: Plant, sprite: Sprite) {
+        var counts: [InteractionType: Int] = [:]
+        let records = FetchDescriptor<InteractionRecord>()
+        if let allRecords = try? modelContext.fetch(records) {
+            for record in allRecords {
+                counts[record.type, default: 0] += 1
+            }
+        }
+        let newlyUnlocked = timeEngine.checkAchievements(
+            plant: plant, sprite: sprite, wallet: wallet,
+            records: achievementRecords, pets: pets,
+            interactionCounts: counts
+        )
+        for achievement in newlyUnlocked {
+            let record = AchievementRecord(achievementIdRaw: achievement.rawValue, unlockedAt: Date(), isUnlocked: true)
+            modelContext.insert(record)
+            wallet?.coins += 10
         }
     }
 }

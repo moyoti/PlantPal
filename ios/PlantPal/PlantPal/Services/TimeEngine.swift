@@ -190,13 +190,6 @@ final class TimeEngine {
         deriveSpriteMood(sprite: sprite, plant: plant, now: now)
     }
     
-    func applyHabitCompletion(plant: Plant, sprite: Sprite, task: HabitTask, wallet: PlayerWallet? = nil) {
-        plant.nutrients += task.nutrientReward
-        plant.lightLevel = min(1, plant.lightLevel + task.sunlightReward)
-        sprite.interactionCount += 1
-        wallet?.coins += 3 + task.streakCount
-    }
-    
     func checkAchievements(plant: Plant, sprite: Sprite, wallet: PlayerWallet?, records: [AchievementRecord], pets: [Pet], interactionCounts: [InteractionType: Int]) -> [Achievement] {
         let unlocked = Set(records.filter { $0.isUnlocked }.map { $0.achievementIdRaw })
         var newlyUnlocked: [Achievement] = []

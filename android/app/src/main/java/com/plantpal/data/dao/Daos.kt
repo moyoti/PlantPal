@@ -7,6 +7,8 @@ import com.plantpal.data.entity.HabitTaskEntity
 import com.plantpal.data.entity.InteractionEntity
 import com.plantpal.data.entity.PlayerWalletEntity
 import com.plantpal.data.entity.PetEntity
+import com.plantpal.data.entity.AchievementEntity
+import com.plantpal.data.entity.DailyLoginEntity
 
 @Dao
 interface PlantDao {
@@ -108,4 +110,37 @@ interface PetDao {
 
     @Query("DELETE FROM pets")
     suspend fun deleteAll()
+}
+
+@Dao
+interface AchievementDao {
+    @Query("SELECT * FROM achievements WHERE achievementIdRaw = :achievementIdRaw LIMIT 1")
+    suspend fun getByAchievementId(achievementIdRaw: String): AchievementEntity?
+
+    @Query("SELECT * FROM achievements")
+    fun getAllAchievementsFlow(): kotlinx.coroutines.flow.Flow<List<AchievementEntity>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(achievement: AchievementEntity)
+
+    @Update
+    suspend fun update(achievement: AchievementEntity)
+
+    @Query("DELETE FROM achievements")
+    suspend fun deleteAll()
+}
+
+@Dao
+interface DailyLoginDao {
+    @Query("SELECT * FROM daily_logins LIMIT 1")
+    suspend fun getDailyLogin(): DailyLoginEntity?
+
+    @Query("SELECT * FROM daily_logins")
+    fun getDailyLoginFlow(): kotlinx.coroutines.flow.Flow<DailyLoginEntity?>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(dailyLogin: DailyLoginEntity)
+
+    @Update
+    suspend fun update(dailyLogin: DailyLoginEntity)
 }
