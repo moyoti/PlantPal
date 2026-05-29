@@ -3,7 +3,6 @@ package com.plantpal.data.dao
 import androidx.room.*
 import com.plantpal.data.entity.PlantEntity
 import com.plantpal.data.entity.SpriteEntity
-import com.plantpal.data.entity.HabitTaskEntity
 import com.plantpal.data.entity.InteractionEntity
 import com.plantpal.data.entity.PlayerWalletEntity
 import com.plantpal.data.entity.PetEntity
@@ -43,24 +42,6 @@ interface SpriteDao {
     suspend fun update(sprite: SpriteEntity)
 
     @Query("DELETE FROM sprites")
-    suspend fun deleteAll()
-}
-
-@Dao
-interface HabitTaskDao {
-    @Query("SELECT * FROM habit_tasks ORDER BY createdAt DESC")
-    fun getAllTasksFlow(): kotlinx.coroutines.flow.Flow<List<HabitTaskEntity>>
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(task: HabitTaskEntity)
-
-    @Update
-    suspend fun update(task: HabitTaskEntity)
-
-    @Delete
-    suspend fun delete(task: HabitTaskEntity)
-
-    @Query("DELETE FROM habit_tasks")
     suspend fun deleteAll()
 }
 

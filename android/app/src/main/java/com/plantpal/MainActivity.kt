@@ -16,11 +16,14 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.plantpal.data.entity.AchievementEntity
+import com.plantpal.data.entity.PetEntity
 import com.plantpal.data.entity.PlantEntity
 import com.plantpal.data.entity.SpriteEntity
 import com.plantpal.data.entity.PlayerWalletEntity
 import com.plantpal.engine.TimeEngine
 import com.plantpal.model.InteractionType
+import com.plantpal.model.PetType
 import com.plantpal.ui.screens.*
 import com.plantpal.ui.theme.PlantPalTheme
 
@@ -46,6 +49,8 @@ fun PlantPalApp() {
     var plant by remember { mutableStateOf<PlantEntity?>(null) }
     var sprite by remember { mutableStateOf<SpriteEntity?>(null) }
     var wallet by remember { mutableStateOf<PlayerWalletEntity?>(null) }
+    var pets by remember { mutableStateOf<List<PetEntity>>(emptyList()) }
+    var achievements by remember { mutableStateOf<List<AchievementEntity>>(emptyList()) }
     val timeEngine = remember { TimeEngine() }
 
     LaunchedEffect(Unit) {
@@ -108,7 +113,19 @@ fun PlantPalApp() {
                 )
             }
             composable("collection") {
-                CollectionScreen(plant, sprite)
+                CollectionScreen(
+                    plant = plant,
+                    sprite = sprite,
+                    wallet = wallet,
+                    pets = pets,
+                    achievements = achievements,
+                    onPurchasePet = { petType ->
+                        if (wallet != null && wallet!!.coins >= petType.unlockCost) {
+                            wallet = wallet!!.copy(coins = wallet!!.coins - petType.unlockCost)
+                            pets = pets + PetEntity(petTypeRaw = petType.name, isOwned = true, name = petType.displayName)
+                        }
+                    }
+                )
             }
             composable("settings") {
                 SettingsScreen(plant) {

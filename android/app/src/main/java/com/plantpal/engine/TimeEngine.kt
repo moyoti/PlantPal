@@ -3,9 +3,13 @@ package com.plantpal.engine
 import com.plantpal.data.entity.PlantEntity
 import com.plantpal.data.entity.SpriteEntity
 import com.plantpal.data.entity.PlayerWalletEntity
-import com.plantpal.data.entity.HabitTaskEntity
+import com.plantpal.data.entity.AchievementEntity
+import com.plantpal.data.entity.DailyLoginEntity
+import com.plantpal.data.entity.PetEntity
+import com.plantpal.model.Achievement
 import com.plantpal.model.GrowthStage
 import com.plantpal.model.InteractionType
+import com.plantpal.model.PetType
 import com.plantpal.model.SpriteMood
 import com.plantpal.model.SpriteEvolutionThreshold
 import com.plantpal.model.WeatherType
@@ -188,16 +192,6 @@ class TimeEngine {
         return Triple(p, s, w)
     }
 
-    fun applyHabitCompletion(
-        plant: PlantEntity, sprite: SpriteEntity, task: HabitTaskEntity,
-        wallet: PlayerWalletEntity? = null
-    ): Triple<PlantEntity, SpriteEntity, PlayerWalletEntity?> {
-        val p = plant.copy(nutrients = plant.nutrients + task.nutrientReward, lightLevel = (plant.lightLevel + task.sunlightReward).coerceIn(0.0, 1.0))
-        val s = sprite.copy(interactionCount = sprite.interactionCount + 1)
-        val w = wallet?.copy(coins = wallet.coins + 3 + task.streakCount)
-        return Triple(p, s, w)
-    }
-
     private fun deriveSpriteMood(sprite: SpriteEntity, plant: PlantEntity, hour: Int): SpriteEntity {
         val mood = when {
             hour >= 22 || hour < 7 -> SpriteMood.SLEEPING
@@ -217,5 +211,56 @@ class TimeEngine {
             return plant.copy(currentWeatherRaw = newWeather.name, lastWeatherChangeAt = now)
         }
         return plant
+    }
+
+    fun checkAchievements(
+        plant: PlantEntity, sprite: SpriteEntity, wallet: PlayerWalletEntity?,
+        achievementRecords: List<AchievementEntity>, pets: List<PetEntity>,
+        interactionCounts: Map<InteractionType, Int>
+    ): List<Achievement> {
+        val unlocked = achievementRecords.filter { it.isUnlocked }.map { it.achievementIdRaw }.toSet()
+        val newlyUnlocked = mutableListOf<Achievement>()
+        fun check(a: Achievement) { if (!unlocked.contains(a.name)) newlyUnlocked.add(a) }
+        if ((interactionCounts[InteractionType.WATER] ?: 0) > 0) check(Achievement.FIRST_WATER)
+        if ((interactionCounts[InteractionType.WATER] ?: 0) >= 100) check(Achievement.GREEN_THUMB)
+        if ((interactionCounts[InteractionType.LIGHT] ?: 0) >= 100) check(Achievement.SUNSHINE_LOVER)
+        if (sprite.interactionCount >= 500) check(Achievement.PLANT_WHISPERER)
+        if ((wallet?.coins ?: 0) >= 1000) check(Achievement.RICH_GARDENER)
+        if (plant.growthStage == GrowthStage.FRUIT) check(Achievement.PLANT_MASTER)
+        if ((interactionCounts[InteractionType.HEAL] ?: 0) >= 10) check(Achievement.HEALER)
+        if ((interactionCounts[InteractionType.SHIELD] ?: 0) >= 10) check(Achievement.PROTECTOR)
+        if ((interactionCounts[InteractionType.DANCE] ?: 0) >= 50) check(Achievement.DANCER)
+        if ((interactionCounts[InteractionType.SING] ?: 0) >= 50) check(Achievement.SINGER)
+        if (interactionCounts.size >= 11) check(Achievement.EXPLORER)
+        if (pets.count { it.isOwned } >= PetType.entries.size) check(Achievement.PET_LOVER)
+        val nonLegendary = Achievement.entries.filter { it != Achievement.LEGENDARY }
+        if (nonLegendary.all { unlocked.contains(it.name) || newlyUnlocked.contains(it) }) check(Achievement.LEGENDARY)
+        return newlyUnlocked
+    }
+
+    fun checkDailyLogin(login: DailyLoginEntity, wallet: PlayerWalletEntity, now: Long = System.currentTimeMillis()): Int {
+        val cal = Calendar.getInstance()
+        cal.timeInMillis = now
+        cal.set(Calendar.HOUR_OF_DAY, 0)
+        cal.set(Calendar.MINUTE, 0)
+        cal.set(Calendar.SECOND, 0)
+        cal.set(Calendar.MILLISECOND, 0)
+        val todayStart = cal.timeInMillis
+        if (login.lastLoginDate >= todayStart) return 0
+        val calYesterday = Calendar.getInstance()
+        calYesterday.add(Calendar.DAY_OF_YEAR, -1)
+        calYesterday.set(Calendar.HOUR_OF_DAY, 0)
+        calYesterday.set(Calendar.MINUTE, 0)
+        calYesterday.set(Calendar.SECOND, 0)
+        calYesterday.set(Calendar.MILLISECOND, 0)
+        val isYesterday = login.lastLoginDate >= calYesterday.timeInMillis
+        val consecutiveDays = if (isYesterday) login.consecutiveDays + 1 else 1
+        val reward = when {
+            consecutiveDays >= 30 -> 200
+            consecutiveDays == 7 -> 50
+            consecutiveDays >= 2 -> 10
+            else -> 5
+        }
+        return reward
     }
 }
