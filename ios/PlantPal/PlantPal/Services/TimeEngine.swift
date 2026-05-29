@@ -197,6 +197,35 @@ final class TimeEngine {
         wallet?.coins += 3 + task.streakCount
     }
     
+    func checkAchievements(plant: Plant, sprite: Sprite, wallet: PlayerWallet?, records: [AchievementRecord], pets: [Pet], interactionCounts: [InteractionType: Int]) -> [Achievement] {
+        let unlocked = Set(records.filter { $0.isUnlocked }.map { $0.achievementIdRaw })
+        var newlyUnlocked: [Achievement] = []
+        
+        func check(_ achievement: Achievement) {
+            if unlocked.contains(achievement.rawValue) { return }
+            newlyUnlocked.append(achievement)
+        }
+        
+        if interactionCounts[.water] ?? 0 > 0 { check(.first_water) }
+        if interactionCounts[.water] ?? 0 >= 100 { check(.green_thumb) }
+        if interactionCounts[.light] ?? 0 >= 100 { check(.sunshine_lover) }
+        if sprite.interactionCount >= 500 { check(.plant_whisperer) }
+        if wallet?.coins ?? 0 >= 1000 { check(.rich_gardener) }
+        if plant.growthStage == .fruit { check(.plant_master) }
+        if interactionCounts[.heal] ?? 0 >= 10 { check(.healer) }
+        if interactionCounts[.shield] ?? 0 >= 10 { check(.protector) }
+        if interactionCounts[.dance] ?? 0 >= 50 { check(.dancer) }
+        if interactionCounts[.sing] ?? 0 >= 50 { check(.singer) }
+        if interactionCounts.count >= 11 { check(.explorer) }
+        if pets.filter({ $0.isOwned }).count >= PetType.allCases.count { check(.pet_lover) }
+        
+        let nonLegendary = Achievement.allCases.filter { $0 != .legendary }
+        let allUnlocked = nonLegendary.allSatisfy { unlocked.contains($0.rawValue) || newlyUnlocked.contains($0) }
+        if allUnlocked { check(.legendary) }
+        
+        return newlyUnlocked
+    }
+
     private func updateWeather(plant: Plant, now: Date) {
         let hoursSinceChange = now.timeIntervalSince(plant.lastWeatherChangeAt) / 3600
         if hoursSinceChange >= 2 + Double.random(in: 0...2) {

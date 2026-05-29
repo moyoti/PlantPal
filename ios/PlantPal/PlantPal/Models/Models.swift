@@ -462,7 +462,7 @@ class InteractionRecord {
     }
 }
 
-enum PetType: String, Codable {
+enum PetType: String, Codable, CaseIterable {
     case cat_sprite
     case dog_sprite
     case bird_sprite

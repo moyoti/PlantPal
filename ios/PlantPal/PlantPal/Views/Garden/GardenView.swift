@@ -7,6 +7,8 @@ struct GardenView: View {
     @Query private var plants: [Plant]
     @Query private var sprites: [Sprite]
     @Query private var wallets: [PlayerWallet]
+    @Query private var dailyLogins: [DailyLogin]
+    @Query private var pets: [Pet]
     @State private var timeEngine = TimeEngine()
     @State private var activeEffect: InteractionType?
     @State private var cloudOffset: CGFloat = 0
@@ -16,6 +18,7 @@ struct GardenView: View {
     @State private var cooldownTimers: [InteractionType: Double] = [:]
     @State private var showInteractionMenu = false
     @State private var showStatusDetail = false
+    @State private var dailyLoginReward: Int? = nil
     private let cooldownTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
     private var plant: Plant? { plants.first }
@@ -44,6 +47,10 @@ struct GardenView: View {
                     topOverlay(sprite: sprite, plant: plant, wallet: wallet)
                     bottomOverlay(plant: plant, sprite: sprite)
                 }
+                
+                if let reward = dailyLoginReward {
+                    dailyLoginRewardOverlay(reward: reward)
+                }
             }
         }
         .onAppear {
@@ -53,6 +60,7 @@ struct GardenView: View {
                 checkAndScheduleReminders(plant: plant)
             }
             startAmbientAnimations()
+            checkDailyLoginReward()
         }
         .onReceive(cooldownTimer) { _ in
             updateCooldowns()
@@ -107,6 +115,8 @@ struct GardenView: View {
                         Text(sprite.name)
                             .font(PixelFonts.header(size: 10))
                             .foregroundColor(.white)
+                        Text(plant.currentWeather.emoji)
+                            .font(.system(size: 12))
                         PixelBadge(text: spriteMoodText(for: sprite), color: moodColor(for: sprite))
                         if plant.isSick {
                             PixelBadge(text: "生病", color: PixelPalette.redDanger)
@@ -430,5 +440,79 @@ struct GardenView: View {
             index = end
         }
         return rows
+    }
+    
+    private func dailyLoginRewardOverlay(reward: Int) -> some View {
+        ZStack {
+            Color.black.opacity(0.5)
+                .ignoresSafeArea()
+                .onTapGesture { withAnimation { dailyLoginReward = nil } }
+            
+            VStack(spacing: PixelSpacing.lg) {
+                Text("🎉")
+                    .font(.system(size: 40))
+                
+                Text("每日登录奖励！")
+                    .font(PixelFonts.header(size: 12))
+                    .foregroundColor(PixelPalette.darkText)
+                
+                if let login = dailyLogins.first {
+                    Text("连续 \(login.consecutiveDays) 天")
+                        .font(PixelFonts.body(size: 14))
+                        .foregroundColor(PixelPalette.mutedText)
+                }
+                
+                HStack(spacing: PixelSpacing.xs) {
+                    Circle().fill(PixelPalette.coinGold).frame(width: 14, height: 14)
+                        .overlay(Circle().stroke(PixelPalette.yellowSunDark, lineWidth: 1))
+                    Text("+\(reward) 金币")
+                        .font(PixelFonts.header(size: 11))
+                        .foregroundColor(PixelPalette.coinGold)
+                }
+                
+                Button {
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                        dailyLoginReward = nil
+                    }
+                } label: {
+                    Text("领取")
+                        .font(PixelFonts.header(size: 10))
+                        .foregroundColor(.white)
+                        .padding(.horizontal, PixelSpacing.xl)
+                        .padding(.vertical, PixelSpacing.sm)
+                        .background(PixelPalette.greenPrimary)
+                        .overlay(
+                            PixelBorder(thickness: 2, cornerSize: 4)
+                                .stroke(PixelPalette.greenDark, lineWidth: 2)
+                        )
+                }
+                .buttonStyle(.plain)
+            }
+            .padding(PixelSpacing.xl)
+            .background(PixelPalette.cardBg)
+            .overlay(
+                PixelBorder(thickness: 3, cornerSize: 6)
+                    .stroke(PixelPalette.coinGold, lineWidth: 3)
+            )
+            .shadow(color: PixelPalette.shadow.opacity(0.3), radius: 0, x: 4, y: 4)
+        }
+        .transition(.opacity.combined(with: .scale(scale: 0.8)))
+    }
+    
+    private func checkDailyLoginReward() {
+        let login: DailyLogin
+        if let existing = dailyLogins.first {
+            login = existing
+        } else {
+            login = DailyLogin()
+            modelContext.insert(login)
+        }
+        guard let wallet else { return }
+        let reward = timeEngine.checkDailyLogin(login: login, wallet: wallet)
+        if reward > 0 {
+            withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+                dailyLoginReward = reward
+            }
+        }
     }
 }
