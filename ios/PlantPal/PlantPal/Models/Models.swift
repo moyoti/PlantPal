@@ -450,3 +450,75 @@ class InteractionRecord {
         set { typeRaw = newValue.rawValue }
     }
 }
+
+enum PetType: String, Codable {
+    case cat_sprite
+    case dog_sprite
+    case bird_sprite
+    case fish_sprite
+    case bunny_sprite
+
+    var displayName: String {
+        switch self {
+        case .cat_sprite: return "猫咪精灵"
+        case .dog_sprite: return "狗狗精灵"
+        case .bird_sprite: return "小鸟精灵"
+        case .fish_sprite: return "小鱼精灵"
+        case .bunny_sprite: return "兔兔精灵"
+        }
+    }
+
+    var unlockCost: Int {
+        switch self {
+        case .cat_sprite: return 100
+        case .dog_sprite: return 150
+        case .bird_sprite: return 200
+        case .fish_sprite: return 250
+        case .bunny_sprite: return 300
+        }
+    }
+
+    var abilities: String {
+        switch self {
+        case .cat_sprite: return "自动收集金币，偶尔发现宝藏"
+        case .dog_sprite: return "保护植物免受伤害，提升友谊速度"
+        case .bird_sprite: return "唱歌效果加倍，偶尔带来种子"
+        case .fish_sprite: return "浇水效果加倍，降低精灵疲劳"
+        case .bunny_sprite: return "玩耍效果加倍，加速植物成长"
+        }
+    }
+}
+
+@Model
+class Pet {
+    var id: UUID = UUID()
+    var name: String = ""
+    var petTypeRaw: String = PetType.cat_sprite.rawValue
+    var isOwned: Bool = false
+    var friendshipLevel: Double = 0.0
+    var lastFedAt: Date = Date.distantPast
+    var lastPlayedAt: Date = Date.distantPast
+
+    init(
+        id: UUID = UUID(),
+        name: String = "",
+        petTypeRaw: String = PetType.cat_sprite.rawValue,
+        isOwned: Bool = false,
+        friendshipLevel: Double = 0.0,
+        lastFedAt: Date = Date.distantPast,
+        lastPlayedAt: Date = Date.distantPast
+    ) {
+        self.id = id
+        self.name = name
+        self.petTypeRaw = petTypeRaw
+        self.isOwned = isOwned
+        self.friendshipLevel = friendshipLevel
+        self.lastFedAt = lastFedAt
+        self.lastPlayedAt = lastPlayedAt
+    }
+
+    var petType: PetType {
+        get { PetType(rawValue: petTypeRaw) ?? .cat_sprite }
+        set { petTypeRaw = newValue.rawValue }
+    }
+}

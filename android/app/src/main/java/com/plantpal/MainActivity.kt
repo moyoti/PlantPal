@@ -4,10 +4,14 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -66,25 +70,19 @@ fun PlantPalApp() {
         bottomBar = {
             NavigationBar {
                 NavigationBarItem(
-                    icon = { Text("🌱") },
+                    icon = { Image(painter = painterResource(id = R.drawable.tab_garden), contentDescription = "花园", modifier = Modifier.size(24.dp)) },
                     label = { Text("花园") },
                     selected = currentRoute == "garden",
                     onClick = { navController.navigate("garden") { popUpTo("garden") { inclusive = true } } }
                 )
                 NavigationBarItem(
-                    icon = { Text("✅") },
-                    label = { Text("习惯") },
-                    selected = currentRoute == "habits",
-                    onClick = { navController.navigate("habits") { popUpTo("garden") } }
-                )
-                NavigationBarItem(
-                    icon = { Text("⭐") },
+                    icon = { Image(painter = painterResource(id = R.drawable.tab_collection), contentDescription = "收藏", modifier = Modifier.size(24.dp)) },
                     label = { Text("收藏") },
                     selected = currentRoute == "collection",
                     onClick = { navController.navigate("collection") { popUpTo("garden") } }
                 )
                 NavigationBarItem(
-                    icon = { Text("⚙️") },
+                    icon = { Image(painter = painterResource(id = R.drawable.tab_settings), contentDescription = "设置", modifier = Modifier.size(24.dp)) },
                     label = { Text("设置") },
                     selected = currentRoute == "settings",
                     onClick = { navController.navigate("settings") { popUpTo("garden") } }
@@ -108,9 +106,6 @@ fun PlantPalApp() {
                         }
                     }
                 )
-            }
-            composable("habits") {
-                Text("习惯任务页面 - 开发中", modifier = Modifier.fillMaxSize())
             }
             composable("collection") {
                 CollectionScreen(plant, sprite)

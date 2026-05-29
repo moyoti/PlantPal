@@ -1,19 +1,28 @@
 package com.plantpal.ui.screens
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -21,7 +30,6 @@ import com.plantpal.data.entity.PlantEntity
 import com.plantpal.data.entity.SpriteEntity
 import com.plantpal.data.entity.PlayerWalletEntity
 import com.plantpal.engine.TimeEngine
-import com.plantpal.model.GrowthStage
 import com.plantpal.model.InteractionType
 import com.plantpal.model.SpriteMood
 
@@ -40,12 +48,19 @@ object PixelPalette {
     val darkText = Color(0xFF2E2E2E)
     val mutedText = Color(0xFF9E9E9E)
     val cardBorder = Color(0xFFBDBDBD)
+    val coinGold = Color(0xFFFFD700)
+    val yellowSunDark = Color(0xFFF9A825)
 }
 
-enum class InteractionTab(val label: String) {
-    CARE("照料"), PLAY("互动")
-}
+private val primaryInteractions = listOf(
+    InteractionType.WATER, InteractionType.LIGHT, InteractionType.FERTILIZE,
+    InteractionType.TOUCH, InteractionType.PET
+)
 
+private val secondaryInteractions = listOf(
+    InteractionType.TALK, InteractionType.SING, InteractionType.HEAL,
+    InteractionType.PLAY, InteractionType.SHIELD, InteractionType.DANCE
+)
 @Composable
 fun GardenScreen(
     plant: PlantEntity?,
@@ -61,79 +76,367 @@ fun GardenScreen(
         return
     }
 
-    var selectedTab by remember { mutableStateOf(InteractionTab.CARE) }
-    val careInteractions = listOf(InteractionType.WATER, InteractionType.LIGHT, InteractionType.FERTILIZE, InteractionType.HEAL, InteractionType.SHIELD)
-    val playInteractions = listOf(InteractionType.TOUCH, InteractionType.TALK, InteractionType.SING, InteractionType.PLAY, InteractionType.DANCE, InteractionType.PET)
-    val currentInteractions = if (selectedTab == InteractionTab.CARE) careInteractions else playInteractions
+    var showInteractionMenu by remember { mutableStateOf(false) }
+    var showStatusDetail by remember { mutableStateOf(false) }
 
-    Column(
-        modifier = Modifier.fillMaxSize().background(PixelPalette.greenBg).padding(10.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp)
+    Box(modifier = Modifier.fillMaxSize()) {
+        FullscreenScene(plant, sprite)
+        TopOverlay(
+            sprite = sprite,
+            plant = plant,
+            wallet = wallet,
+            showStatusDetail = showStatusDetail,
+            onToggleStatus = { showStatusDetail = !showStatusDetail }
+        )
+        BottomOverlay(
+            cooldownState = cooldownState,
+            onInteraction = onInteraction,
+            showInteractionMenu = showInteractionMenu,
+            onToggleMenu = { showInteractionMenu = !showInteractionMenu }
+        )
+    }
+}
+
+@Composable
+private fun FullscreenScene(plant: PlantEntity, sprite: SpriteEntity) {
+    val context = LocalContext.current
+    val bgResId = context.resources.getIdentifier(
+        "bg_${plant.backgroundScene}", "drawable", context.packageName
+    )
+    if (bgResId != 0) {
+        Image(
+            painter = painterResource(id = bgResId),
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
+    } else {
+        Box(Modifier.fillMaxSize().background(PixelPalette.greenBg))
+    }
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
     ) {
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-            Column {
-                Text("我的花园", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = PixelPalette.darkText)
-                Box(Modifier.width(72.dp).height(2.dp).background(PixelPalette.greenPrimary))
-            }
-            if (wallet != null) {
-                Surface(color = PixelPalette.yellowSun.copy(alpha = 0.12f), shape = RoundedCornerShape(2.dp), border = BorderStroke(1.dp, PixelPalette.yellowSun.copy(alpha = 0.5f))) {
-                    Row(Modifier.padding(horizontal = 4.dp, vertical = 2.dp), horizontalArrangement = Arrangement.spacedBy(2.dp)) {
-                        Box(Modifier.size(8.dp).background(PixelPalette.yellowSun, RoundedCornerShape(4.dp)))
-                        Text("${wallet.coins}", fontSize = 7.sp, fontWeight = FontWeight.Bold, color = PixelPalette.darkText)
-                    }
-                }
-            }
-        }
-
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.CenterVertically) {
-            Text(sprite.name, fontSize = 9.sp, fontWeight = FontWeight.Bold, color = PixelPalette.greenPrimary)
-            MoodBadge(sprite.mood)
-            if (plant.isSick) StatusBadge("生病", PixelPalette.redDanger)
-            if (System.currentTimeMillis() < plant.shieldedUntil) StatusBadge("护盾", PixelPalette.blueWater)
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Spacer(Modifier.weight(1f))
-            if (sprite.fatigue > 0.5) {
-                Row(horizontalArrangement = Arrangement.spacedBy(1.dp)) {
-                    Text("疲惫", fontSize = 6.sp, color = PixelPalette.orangeWarnFix)
-                    Box(Modifier.width(20.dp).height(4.dp).background(PixelPalette.orangeWarnFix.copy(alpha = 0.3f))) {
-                        Box(Modifier.width((20 * sprite.fatigue.coerceIn(0.0, 1.0)).dp).height(4.dp).background(PixelPalette.orangeWarnFix))
+            val plantResId = context.resources.getIdentifier(
+                "plant_${plant.growthStageRaw.lowercase()}", "drawable", context.packageName
+            )
+            if (plantResId != 0) {
+                Image(
+                    painter = painterResource(id = plantResId),
+                    contentDescription = plant.growthStage.displayName,
+                    modifier = Modifier.size(width = 140.dp, height = 200.dp)
+                )
+            }
+            val potResId = context.resources.getIdentifier(
+                "pot_${plant.potStyle}", "drawable", context.packageName
+            )
+            if (potResId != 0) {
+                Image(
+                    painter = painterResource(id = potResId),
+                    contentDescription = null,
+                    modifier = Modifier.size(width = 110.dp, height = 55.dp)
+                )
+            }
+            Spacer(Modifier.weight(1f))
+        }
+        val spriteResId = context.resources.getIdentifier(
+            "sprite_${sprite.evolutionLevel}_${sprite.moodRaw.lowercase()}",
+            "drawable", context.packageName
+        )
+        if (spriteResId != 0) {
+            Image(
+                painter = painterResource(id = spriteResId),
+                contentDescription = sprite.name,
+                modifier = Modifier.size(80.dp).offset(x = 72.dp, y = (-48).dp)
+            )
+        }
+    }
+}
+@Composable
+private fun BoxScope.TopOverlay(
+    sprite: SpriteEntity,
+    plant: PlantEntity,
+    wallet: PlayerWalletEntity?,
+    showStatusDetail: Boolean,
+    onToggleStatus: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .align(Alignment.TopStart)
+            .fillMaxWidth()
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(
+                        Color.Black.copy(alpha = 0.55f),
+                        Color.Black.copy(alpha = 0.25f),
+                        Color.Transparent
+                    )
+                )
+            )
+            .clipToBounds()
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+                .padding(top = 12.dp, bottom = 6.dp),
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(sprite.name, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                    MoodBadge(sprite.mood)
+                    if (plant.isSick) StatusBadge("生病", PixelPalette.redDanger)
+                    if (System.currentTimeMillis() < plant.shieldedUntil) StatusBadge("护盾", PixelPalette.blueWater)
+                }
+                if (sprite.fatigue > 0.5) {
+                    Row(
+                        modifier = Modifier.padding(top = 2.dp),
+                        horizontalArrangement = Arrangement.spacedBy(2.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text("疲僫", fontSize = 8.sp, color = PixelPalette.orangeWarnFix)
+                        Box(
+                            Modifier.width(28.dp).height(5.dp)
+                                .background(Color.White.copy(alpha = 0.3f))
+                                .border(1.dp, Color.White.copy(alpha = 0.5f), RoundedCornerShape(1.dp))
+                        ) {
+                            Box(
+                                Modifier.width((28 * sprite.fatigue.coerceIn(0.0, 1.0)).dp).height(5.dp)
+                                    .background(PixelPalette.orangeWarnFix)
+                            )
+                        }
                     }
-                    if (sprite.fatigue > 0.6) {
-                        Text("↓", fontSize = 6.sp, color = PixelPalette.redDanger)
+                }
+            }
+            Spacer(Modifier.weight(1f))
+            if (wallet != null) {
+                Surface(
+                    color = Color.Black.copy(alpha = 0.3f),
+                    shape = RoundedCornerShape(3.dp),
+                    border = BorderStroke(1.dp, PixelPalette.coinGold.copy(alpha = 0.4f))
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp),
+                        horizontalArrangement = Arrangement.spacedBy(3.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Box(Modifier.size(10.dp)
+                            .background(PixelPalette.coinGold, RoundedCornerShape(5.dp))
+                            .border(1.dp, PixelPalette.yellowSunDark, RoundedCornerShape(5.dp))
+                        )
+                        Text("${wallet.coins}", fontSize = 10.sp, fontWeight = FontWeight.Bold, color = PixelPalette.coinGold)
                     }
                 }
             }
-        }
-
-        Box(Modifier.fillMaxWidth().height(160.dp).background(PixelPalette.cream.copy(alpha = 0.3f), RoundedCornerShape(4.dp)).border(2.dp, PixelPalette.cardBorder, RoundedCornerShape(4.dp)), contentAlignment = Alignment.Center) {
-            Text(stageEmoji(plant.growthStage), fontSize = 60.sp, modifier = Modifier.offset(y = (-16).dp))
-            Text(spriteMoodEmoji(sprite.mood), fontSize = 28.sp, modifier = Modifier.offset(x = 50.dp, y = (-30).dp))
-        }
-
-        Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
-            StatusBarRow("水", plant.waterLevel, PixelPalette.blueWater)
-            StatusBarRow("光", plant.lightLevel, PixelPalette.yellowSun)
-            StatusBarRow("命", plant.health, PixelPalette.greenLight)
-        }
-
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(0.dp)) {
-            TabButton("照料", selectedTab == InteractionTab.CARE, PixelPalette.greenPrimary) { selectedTab = InteractionTab.CARE }
-            TabButton("互动", selectedTab == InteractionTab.PLAY, PixelPalette.pinkLove) { selectedTab = InteractionTab.PLAY }
-        }
-
-        if (currentInteractions.size <= 5) {
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                currentInteractions.forEach { type -> InteractionBtn(type, cooldownState, onInteraction) }
-            }
-        } else {
-            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    currentInteractions.take(5).forEach { type -> InteractionBtn(type, cooldownState, onInteraction) }
-                }
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    currentInteractions.drop(5).forEach { type -> InteractionBtn(type, cooldownState, onInteraction) }
-                }
+            Box(
+                modifier = Modifier.size(24.dp)
+                    .background(Color.White.copy(alpha = 0.15f), RoundedCornerShape(4.dp))
+                    .border(1.dp, Color.White.copy(alpha = 0.3f), RoundedCornerShape(4.dp))
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        onClick = onToggleStatus
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    if (showStatusDetail) "▲" else "▼",
+                    fontSize = 10.sp, fontWeight = FontWeight.Bold,
+                    color = Color.White.copy(alpha = 0.8f)
+                )
             }
         }
+        AnimatedVisibility(
+            visible = showStatusDetail,
+            enter = fadeIn() + slideInVertically { -it },
+            exit = fadeOut() + slideOutVertically { -it }
+        ) {
+            Column(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).padding(bottom = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                StatusBarRow("水", plant.waterLevel, PixelPalette.blueWater)
+                StatusBarRow("光", plant.lightLevel, PixelPalette.yellowSun)
+                StatusBarRow("命", plant.health, PixelPalette.greenLight)
+            }
+        }
+    }
+}
+
+@Composable
+private fun BoxScope.BottomOverlay(
+    cooldownState: TimeEngine.CooldownState,
+    onInteraction: (InteractionType) -> Unit,
+    showInteractionMenu: Boolean,
+    onToggleMenu: () -> Unit
+) {
+    Column(modifier = Modifier.align(Alignment.BottomStart).fillMaxWidth()) {
+        AnimatedVisibility(
+            visible = showInteractionMenu,
+            enter = fadeIn() + slideInVertically { it },
+            exit = fadeOut() + slideOutVertically { it }
+        ) {
+            SecondaryMenu(cooldownState = cooldownState, onInteraction = onInteraction)
+        }
+        PrimaryBar(
+            cooldownState = cooldownState,
+            onInteraction = onInteraction,
+            showInteractionMenu = showInteractionMenu,
+            onToggleMenu = onToggleMenu
+        )
+    }
+}
+
+@Composable
+private fun SecondaryMenu(
+    cooldownState: TimeEngine.CooldownState,
+    onInteraction: (InteractionType) -> Unit
+) {
+    val rows = splitIntoRows(secondaryInteractions, 3)
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp)
+            .padding(bottom = 6.dp)
+            .background(Color.Black.copy(alpha = 0.5f), RoundedCornerShape(8.dp))
+            .border(1.dp, Color.White.copy(alpha = 0.2f), RoundedCornerShape(8.dp))
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(6.dp)
+    ) {
+        rows.forEach { row ->
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                row.forEach { type ->
+                    InteractionButton(
+                        type = type,
+                        cooldownState = cooldownState,
+                        onClick = onInteraction,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+                repeat(3 - row.size) { Spacer(Modifier.weight(1f)) }
+            }
+        }
+    }
+}
+
+@Composable
+private fun PrimaryBar(
+    cooldownState: TimeEngine.CooldownState,
+    onInteraction: (InteractionType) -> Unit,
+    showInteractionMenu: Boolean,
+    onToggleMenu: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 12.dp)
+            .padding(bottom = 8.dp)
+            .background(Color.Black.copy(alpha = 0.5f), RoundedCornerShape(10.dp))
+            .border(1.dp, Color.White.copy(alpha = 0.2f), RoundedCornerShape(10.dp))
+            .padding(horizontal = 12.dp, vertical = 8.dp),
+        horizontalArrangement = Arrangement.spacedBy(6.dp)
+    ) {
+        primaryInteractions.forEach { type ->
+            InteractionButton(
+                type = type,
+                cooldownState = cooldownState,
+                onClick = onInteraction,
+                modifier = Modifier.weight(1f)
+            )
+        }
+        Column(
+            modifier = Modifier.weight(1f),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Box(
+                modifier = Modifier
+                    .width(40.dp).height(36.dp)
+                    .background(Color.White.copy(alpha = 0.15f), RoundedCornerShape(6.dp))
+                    .border(2.dp, Color.White.copy(alpha = 0.4f), RoundedCornerShape(6.dp))
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        onClick = onToggleMenu
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    if (showInteractionMenu) "✕" else "…",
+                    fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color.White
+                )
+            }
+            Text(
+                if (showInteractionMenu) "收起" else "更多",
+                fontSize = 8.sp, color = Color.White.copy(alpha = 0.8f)
+            )
+        }
+    }
+}
+
+@Composable
+private fun InteractionButton(
+    type: InteractionType,
+    cooldownState: TimeEngine.CooldownState,
+    onClick: (InteractionType) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val remaining = cooldownState.remainingCooldown(type)
+    val onCooldown = remaining > 0
+    val btnColor = typeToColor(type)
+    val context = LocalContext.current
+    Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
+        Box(
+            modifier = Modifier
+                .width(40.dp).height(36.dp)
+                .background(btnColor.copy(alpha = if (onCooldown) 0.06f else 0.2f), RoundedCornerShape(6.dp))
+                .border(
+                    width = if (onCooldown) 1.dp else 2.dp,
+                    color = btnColor.copy(alpha = if (onCooldown) 0.2f else 0.6f),
+                    shape = RoundedCornerShape(6.dp)
+                )
+                .clickable(
+                    enabled = !onCooldown,
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                    onClick = { onClick(type) }
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            val resId = context.resources.getIdentifier(type.icon, "drawable", context.packageName)
+            if (resId != 0) {
+                Image(
+                    painter = painterResource(id = resId),
+                    contentDescription = type.displayName,
+                    modifier = Modifier.size(24.dp),
+                    alpha = if (onCooldown) 0.3f else 1f
+                )
+            }
+            if (onCooldown) {
+                Box(
+                    Modifier.fillMaxWidth().height(36.dp)
+                        .background(Color.Black.copy(alpha = 0.5f), RoundedCornerShape(6.dp)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("${remaining.toInt() + 1}", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                }
+            }
+        }
+        Text(
+            type.displayName,
+            fontSize = 8.sp,
+            color = if (onCooldown) PixelPalette.mutedText else Color.White,
+            lineHeight = 10.sp
+        )
     }
 }
 
@@ -147,48 +450,28 @@ private fun MoodBadge(mood: SpriteMood) {
         SpriteMood.SLEEPING -> "睡觉" to PixelPalette.purpleNight
     }
     Surface(color = color, shape = RoundedCornerShape(1.dp)) {
-        Text(text, modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp), fontSize = 7.sp, color = Color.White)
+        Text(text, modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp), fontSize = 8.sp, color = Color.White)
     }
 }
 
 @Composable
 private fun StatusBadge(text: String, color: Color) {
     Surface(color = color, shape = RoundedCornerShape(1.dp)) {
-        Text(text, modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp), fontSize = 6.sp, color = Color.White)
+        Text(text, modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp), fontSize = 7.sp, color = Color.White)
     }
 }
 
 @Composable
-private fun RowScope.TabButton(label: String, selected: Boolean, color: Color, onClick: () -> Unit) {
-    Box(Modifier.weight(1f).clickable { onClick() }.background(if (selected) color.copy(alpha = 0.15f) else PixelPalette.greenBg.copy(alpha = 0.5f)).padding(vertical = 5.dp), contentAlignment = Alignment.Center) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(label, fontSize = 8.sp, fontWeight = FontWeight.Bold, color = if (selected) color else PixelPalette.mutedText)
-            Box(Modifier.width(40.dp).height(if (selected) 2.dp else 1.dp).background(if (selected) color else PixelPalette.cardBorder.copy(alpha = 0.3f)))
-        }
-    }
-}
-
-@Composable
-private fun RowScope.InteractionBtn(type: InteractionType, cooldownState: TimeEngine.CooldownState, onClick: (InteractionType) -> Unit) {
-    val remaining = cooldownState.remainingCooldown(type)
-    val onCooldown = remaining > 0
-    val btnColor = typeToColor(type)
-
-    Box(Modifier.weight(1f).clickable(enabled = !onCooldown) { onClick(type) }.background(btnColor.copy(alpha = if (onCooldown) 0.04f else 0.12f), RoundedCornerShape(4.dp)).border(if (onCooldown) 1.dp else 2.dp, btnColor.copy(alpha = if (onCooldown) 0.15f else 0.4f), RoundedCornerShape(4.dp)).padding(vertical = 6.dp), contentAlignment = Alignment.Center) {
-        if (onCooldown) {
-            Box(Modifier.fillMaxWidth().height(32.dp).background(Color.Black.copy(alpha = 0.45f), RoundedCornerShape(4.dp)), contentAlignment = Alignment.Center) {
-                Text("${remaining.toInt() + 1}", fontSize = 9.sp, fontWeight = FontWeight.Bold, color = Color.White)
-            }
-        } else {
-            Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                val context = LocalContext.current
-                val resId = context.resources.getIdentifier(type.icon, "drawable", context.packageName)
-                if (resId != 0) {
-                    Image(painter = painterResource(id = resId), contentDescription = type.displayName, modifier = Modifier.size(24.dp))
-                }
-                Text(type.displayName, fontSize = 7.sp, color = PixelPalette.darkText)
-            }
-        }
+private fun StatusBarRow(label: String, value: Double, color: Color) {
+    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+        Text(label, fontSize = 9.sp, color = color, modifier = Modifier.width(20.dp))
+        LinearProgressIndicator(
+            progress = { value.toFloat() },
+            modifier = Modifier.weight(1f).height(10.dp),
+            color = color,
+            trackColor = color.copy(alpha = 0.2f)
+        )
+        Text("${(value * 100).toInt()}%", fontSize = 8.sp, color = PixelPalette.mutedText, modifier = Modifier.width(30.dp))
     }
 }
 
@@ -206,33 +489,13 @@ private fun typeToColor(type: InteractionType): Color = when (type) {
     InteractionType.PET -> Color(0xFFA1887F)
 }
 
-private fun stageEmoji(stage: GrowthStage): String = when (stage) {
-    GrowthStage.SEED -> "🌱"
-    GrowthStage.SPROUT -> "🌿"
-    GrowthStage.BUD -> "🌸"
-    GrowthStage.BLOOM -> "🌺"
-    GrowthStage.FRUIT -> "🍎"
-    GrowthStage.WILTED -> "🥀"
-}
-
-private fun spriteMoodEmoji(mood: SpriteMood): String = when (mood) {
-    SpriteMood.HAPPY -> "🧚"
-    SpriteMood.EXCITED -> "✨"
-    SpriteMood.WORRIED -> "😟"
-    SpriteMood.SAD -> "😢"
-    SpriteMood.SLEEPING -> "💤"
-}
-
-@Composable
-private fun StatusBarRow(label: String, value: Double, color: Color) {
-    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-        Text(label, fontSize = 9.sp, color = color, modifier = Modifier.width(20.dp))
-        LinearProgressIndicator(
-            progress = { value.toFloat() },
-            modifier = Modifier.weight(1f).height(10.dp),
-            color = color,
-            trackColor = color.copy(alpha = 0.2f)
-        )
-        Text("${(value * 100).toInt()}%", fontSize = 8.sp, color = PixelPalette.mutedText, modifier = Modifier.width(30.dp))
+private fun splitIntoRows(items: List<InteractionType>, columns: Int): List<List<InteractionType>> {
+    val rows = mutableListOf<List<InteractionType>>()
+    var index = 0
+    while (index < items.size) {
+        val end = minOf(index + columns, items.size)
+        rows.add(items.subList(index, end))
+        index = end
     }
+    return rows
 }

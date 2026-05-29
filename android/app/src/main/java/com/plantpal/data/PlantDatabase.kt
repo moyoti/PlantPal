@@ -8,11 +8,13 @@ import com.plantpal.data.dao.SpriteDao
 import com.plantpal.data.dao.HabitTaskDao
 import com.plantpal.data.dao.InteractionDao
 import com.plantpal.data.dao.PlayerWalletDao
+import com.plantpal.data.dao.PetDao
 import com.plantpal.data.entity.PlantEntity
 import com.plantpal.data.entity.SpriteEntity
 import com.plantpal.data.entity.HabitTaskEntity
 import com.plantpal.data.entity.InteractionEntity
 import com.plantpal.data.entity.PlayerWalletEntity
+import com.plantpal.data.entity.PetEntity
 
 @Database(
     entities = [
@@ -20,9 +22,10 @@ import com.plantpal.data.entity.PlayerWalletEntity
         SpriteEntity::class,
         HabitTaskEntity::class,
         InteractionEntity::class,
-        PlayerWalletEntity::class
+        PlayerWalletEntity::class,
+        PetEntity::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -32,4 +35,5 @@ abstract class PlantDatabase : RoomDatabase() {
     abstract fun habitTaskDao(): HabitTaskDao
     abstract fun interactionDao(): InteractionDao
     abstract fun walletDao(): PlayerWalletDao
+    abstract fun petDao(): PetDao
 }

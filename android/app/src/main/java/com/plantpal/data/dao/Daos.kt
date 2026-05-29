@@ -6,6 +6,7 @@ import com.plantpal.data.entity.SpriteEntity
 import com.plantpal.data.entity.HabitTaskEntity
 import com.plantpal.data.entity.InteractionEntity
 import com.plantpal.data.entity.PlayerWalletEntity
+import com.plantpal.data.entity.PetEntity
 
 @Dao
 interface PlantDao {
@@ -86,4 +87,25 @@ interface PlayerWalletDao {
 
     @Update
     suspend fun update(wallet: PlayerWalletEntity)
+}
+
+@Dao
+interface PetDao {
+    @Query("SELECT * FROM pets")
+    fun getAllPetsFlow(): kotlinx.coroutines.flow.Flow<List<PetEntity>>
+
+    @Query("SELECT * FROM pets WHERE isOwned = 1")
+    fun getOwnedPetsFlow(): kotlinx.coroutines.flow.Flow<List<PetEntity>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(pet: PetEntity)
+
+    @Update
+    suspend fun update(pet: PetEntity)
+
+    @Delete
+    suspend fun delete(pet: PetEntity)
+
+    @Query("DELETE FROM pets")
+    suspend fun deleteAll()
 }

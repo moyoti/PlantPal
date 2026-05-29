@@ -199,3 +199,34 @@ enum class SpriteEvolutionThreshold(val level: Int) {
 enum class TaskFrequency {
     DAILY, WEEKLY, CUSTOM
 }
+
+enum class PetType {
+    CAT_SPRITE, DOG_SPRITE, BIRD_SPRITE, FISH_SPRITE, BUNNY_SPRITE;
+
+    val displayName: String
+        get() = when (this) {
+            CAT_SPRITE -> "猫咪精灵"
+            DOG_SPRITE -> "狗狗精灵"
+            BIRD_SPRITE -> "小鸟精灵"
+            FISH_SPRITE -> "小鱼精灵"
+            BUNNY_SPRITE -> "兔兔精灵"
+        }
+
+    val unlockCost: Int
+        get() = when (this) {
+            CAT_SPRITE -> 100
+            DOG_SPRITE -> 150
+            BIRD_SPRITE -> 200
+            FISH_SPRITE -> 250
+            BUNNY_SPRITE -> 300
+        }
+
+    val abilities: String
+        get() = when (this) {
+            CAT_SPRITE -> "自动收集金币，偶尔发现宝藏"
+            DOG_SPRITE -> "保护植物免受伤害，提升友谊速度"
+            BIRD_SPRITE -> "唱歌效果加倍，偶尔带来种子"
+            FISH_SPRITE -> "浇水效果加倍，降低精灵疲劳"
+            BUNNY_SPRITE -> "玩耍效果加倍，加速植物成长"
+        }
+}

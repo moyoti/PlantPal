@@ -6,6 +6,7 @@ import com.plantpal.model.GrowthStage
 import com.plantpal.model.SpriteMood
 import com.plantpal.model.InteractionType
 import com.plantpal.model.TaskFrequency
+import com.plantpal.model.PetType
 
 class Converters {
     @TypeConverter
@@ -37,4 +38,10 @@ class Converters {
 
     @TypeConverter
     fun toTaskFrequency(value: String): TaskFrequency = try { TaskFrequency.valueOf(value) } catch (_: Exception) { TaskFrequency.DAILY }
+
+    @TypeConverter
+    fun fromPetType(value: PetType): String = value.name
+
+    @TypeConverter
+    fun toPetType(value: String): PetType = try { PetType.valueOf(value) } catch (_: Exception) { PetType.CAT_SPRITE }
 }
