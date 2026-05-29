@@ -21,7 +21,7 @@ struct PlantPalApp: App {
                 }
             }
         }
-        .modelContainer(for: [Plant.self, Sprite.self, InteractionRecord.self, OwnedDecoration.self, PlayerWallet.self])
+        .modelContainer(for: [Plant.self, Sprite.self, InteractionRecord.self, OwnedDecoration.self, PlayerWallet.self, Pet.self, AchievementRecord.self, DailyLogin.self])
     }
 }
 

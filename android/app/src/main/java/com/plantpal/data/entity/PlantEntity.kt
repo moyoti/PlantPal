@@ -5,6 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.plantpal.model.GrowthStage
 import com.plantpal.model.PlantSpecies
+import com.plantpal.model.WeatherType
 import java.util.UUID
 
 @Entity(tableName = "plants")
@@ -27,6 +28,10 @@ data class PlantEntity(
     val isSick: Boolean = false,
     @ColumnInfo(defaultValue = "0")
     val shieldedUntil: Long = 0L,
+    @ColumnInfo(defaultValue = "SUNNY")
+    val currentWeatherRaw: String = "SUNNY",
+    @ColumnInfo(defaultValue = "0")
+    val lastWeatherChangeAt: Long = System.currentTimeMillis(),
     @ColumnInfo(name = "totalCareEvents", defaultValue = "0")
     val totalCareEvents: Int = 0,
     val createdAt: Long = System.currentTimeMillis(),
@@ -38,6 +43,9 @@ data class PlantEntity(
 
     val growthStage: GrowthStage
         get() = try { GrowthStage.valueOf(growthStageRaw) } catch (_: Exception) { GrowthStage.SEED }
+
+    val currentWeather: WeatherType
+        get() = try { WeatherType.valueOf(currentWeatherRaw) } catch (_: Exception) { WeatherType.SUNNY }
 
     fun withSpecies(species: PlantSpecies): PlantEntity = copy(speciesRaw = species.name)
     fun withGrowthStage(stage: GrowthStage): PlantEntity = copy(growthStageRaw = stage.name)

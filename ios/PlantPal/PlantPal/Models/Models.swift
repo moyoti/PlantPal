@@ -271,6 +271,8 @@ class Plant {
     var backgroundScene: String = "garden"
     var isSick: Bool = false
     var shieldedUntil: Date = Date.distantPast
+    var currentWeatherRaw: String = WeatherType.sunny.rawValue
+    var lastWeatherChangeAt: Date = Date()
     
     init(
         id: UUID = UUID(),
@@ -290,7 +292,9 @@ class Plant {
         potStyle: String = "default",
         backgroundScene: String = "garden",
         isSick: Bool = false,
-        shieldedUntil: Date = Date.distantPast
+        shieldedUntil: Date = Date.distantPast,
+        currentWeatherRaw: String = WeatherType.sunny.rawValue,
+        lastWeatherChangeAt: Date = Date()
     ) {
         self.id = id
         self.name = name
@@ -310,6 +314,8 @@ class Plant {
         self.backgroundScene = backgroundScene
         self.isSick = isSick
         self.shieldedUntil = shieldedUntil
+        self.currentWeatherRaw = currentWeatherRaw
+        self.lastWeatherChangeAt = lastWeatherChangeAt
     }
     
     var species: PlantSpecies {
@@ -320,6 +326,11 @@ class Plant {
     var growthStage: GrowthStage {
         get { GrowthStage(rawValue: growthStageRaw) ?? .seed }
         set { growthStageRaw = newValue.rawValue }
+    }
+    
+    var currentWeather: WeatherType {
+        get { WeatherType(rawValue: currentWeatherRaw) ?? .sunny }
+        set { currentWeatherRaw = newValue.rawValue }
     }
     
     static func createDefault(species: PlantSpecies = .flower, name: String = "小绿") -> Plant {
@@ -520,5 +531,222 @@ class Pet {
     var petType: PetType {
         get { PetType(rawValue: petTypeRaw) ?? .cat_sprite }
         set { petTypeRaw = newValue.rawValue }
+    }
+}
+
+// MARK: - Weather System
+
+enum WeatherType: String, Codable {
+    case sunny
+    case cloudy
+    case rainy
+    case stormy
+    case snowy
+
+    var displayName: String {
+        switch self {
+        case .sunny: return "晴天"
+        case .cloudy: return "多云"
+        case .rainy: return "雨天"
+        case .stormy: return "暴风"
+        case .snowy: return "雪天"
+        }
+    }
+
+    var emoji: String {
+        switch self {
+        case .sunny: return "☀️"
+        case .cloudy: return "☁️"
+        case .rainy: return "🌧️"
+        case .stormy: return "⛈️"
+        case .snowy: return "❄️"
+        }
+    }
+
+    var waterDecayMultiplier: Double {
+        switch self {
+        case .sunny: return 1.0
+        case .cloudy: return 0.9
+        case .rainy: return 0.5
+        case .stormy: return 1.2
+        case .snowy: return 0.6
+        }
+    }
+
+    var lightDecayMultiplier: Double {
+        switch self {
+        case .sunny: return 0.8
+        case .cloudy: return 1.2
+        case .rainy: return 1.3
+        case .stormy: return 1.5
+        case .snowy: return 1.4
+        }
+    }
+
+    var healthDecayMultiplier: Double {
+        switch self {
+        case .sunny: return 1.0
+        case .cloudy: return 1.0
+        case .rainy: return 1.1
+        case .stormy: return 1.5
+        case .snowy: return 1.0
+        }
+    }
+
+    var growthMultiplier: Double {
+        switch self {
+        case .sunny: return 1.2
+        case .cloudy: return 1.0
+        case .rainy: return 0.9
+        case .stormy: return 0.3
+        case .snowy: return 0.0
+        }
+    }
+
+    static func randomWeather(excluding current: WeatherType? = nil) -> WeatherType {
+        let all: [WeatherType] = [.sunny, .sunny, .cloudy, .cloudy, .rainy, .stormy, .snowy]
+        let filtered = all.filter { $0 != current }
+        return filtered.randomElement() ?? .sunny
+    }
+}
+
+// MARK: - Achievement System
+
+enum Achievement: String, Codable, CaseIterable {
+    case first_water
+    case green_thumb
+    case sunshine_lover
+    case plant_whisperer
+    case early_bird
+    case dedicated
+    case rich_gardener
+    case pet_lover
+    case plant_master
+    case healer
+    case protector
+    case dancer
+    case singer
+    case explorer
+    case legendary
+
+    var displayName: String {
+        switch self {
+        case .first_water: return "初露锋芒"
+        case .green_thumb: return "绿手指"
+        case .sunshine_lover: return "阳光爱好者"
+        case .plant_whisperer: return "植物语者"
+        case .early_bird: return "早起鸟"
+        case .dedicated: return "坚持不懈"
+        case .rich_gardener: return "富有园丁"
+        case .pet_lover: return "宠物达人"
+        case .plant_master: return "植物大师"
+        case .healer: return "治愈之手"
+        case .protector: return "守护者"
+        case .dancer: return "舞者"
+        case .singer: return "歌唱家"
+        case .explorer: return "探索者"
+        case .legendary: return "传奇园丁"
+        }
+    }
+
+    var achievementDescription: String {
+        switch self {
+        case .first_water: return "第一次浇水"
+        case .green_thumb: return "浇水100次"
+        case .sunshine_lover: return "光照100次"
+        case .plant_whisperer: return "互动500次"
+        case .early_bird: return "连续登录7天"
+        case .dedicated: return "连续登录30天"
+        case .rich_gardener: return "拥有1000金币"
+        case .pet_lover: return "拥有全部宠物"
+        case .plant_master: return "植物达到结果阶段"
+        case .healer: return "治疗10次"
+        case .protector: return "护盾10次"
+        case .dancer: return "跳舞50次"
+        case .singer: return "唱歌50次"
+        case .explorer: return "使用全部互动类型"
+        case .legendary: return "解锁所有其他成就"
+        }
+    }
+
+    var iconEmoji: String {
+        switch self {
+        case .first_water: return "💧"
+        case .green_thumb: return "🌱"
+        case .sunshine_lover: return "☀️"
+        case .plant_whisperer: return "🌿"
+        case .early_bird: return "🐦"
+        case .dedicated: return "🔥"
+        case .rich_gardener: return "💰"
+        case .pet_lover: return "🐾"
+        case .plant_master: return "🌳"
+        case .healer: return "💚"
+        case .protector: return "🛡️"
+        case .dancer: return "💃"
+        case .singer: return "🎤"
+        case .explorer: return "🗺️"
+        case .legendary: return "👑"
+        }
+    }
+}
+
+@Model
+class AchievementRecord {
+    var id: UUID = UUID()
+    var achievementIdRaw: String = Achievement.first_water.rawValue
+    var unlockedAt: Date = Date()
+    var isUnlocked: Bool = false
+
+    init(
+        id: UUID = UUID(),
+        achievementIdRaw: String = Achievement.first_water.rawValue,
+        unlockedAt: Date = Date(),
+        isUnlocked: Bool = false
+    ) {
+        self.id = id
+        self.achievementIdRaw = achievementIdRaw
+        self.unlockedAt = unlockedAt
+        self.isUnlocked = isUnlocked
+    }
+
+    var achievement: Achievement {
+        get { Achievement(rawValue: achievementIdRaw) ?? .first_water }
+        set { achievementIdRaw = newValue.rawValue }
+    }
+}
+
+// MARK: - Daily Login
+
+@Model
+class DailyLogin {
+    var id: UUID = UUID()
+    var lastLoginDate: Date = Date()
+    var consecutiveDays: Int = 0
+    var totalLogins: Int = 0
+    var lastRewardClaimed: Date = Date.distantPast
+
+    init(
+        id: UUID = UUID(),
+        lastLoginDate: Date = Date(),
+        consecutiveDays: Int = 0,
+        totalLogins: Int = 0,
+        lastRewardClaimed: Date = Date.distantPast
+    ) {
+        self.id = id
+        self.lastLoginDate = lastLoginDate
+        self.consecutiveDays = consecutiveDays
+        self.totalLogins = totalLogins
+        self.lastRewardClaimed = lastRewardClaimed
+    }
+
+    var todayReward: Int {
+        switch consecutiveDays {
+        case 1: return 5
+        case 2...6: return 10
+        case 7: return 50
+        case 8...29: return 15
+        case 30...: return 200
+        default: return 5
+        }
     }
 }

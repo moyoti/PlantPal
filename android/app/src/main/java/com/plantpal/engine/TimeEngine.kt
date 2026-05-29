@@ -8,6 +8,7 @@ import com.plantpal.model.GrowthStage
 import com.plantpal.model.InteractionType
 import com.plantpal.model.SpriteMood
 import com.plantpal.model.SpriteEvolutionThreshold
+import com.plantpal.model.WeatherType
 import java.util.Calendar
 
 class TimeEngine {
@@ -45,10 +46,13 @@ class TimeEngine {
         val isShielded = now < plant.shieldedUntil
         var p = plant
 
+        p = updateWeather(p, now)
+        val weather = p.currentWeather
+
         if (!isShielded) {
             p = p.copy(
-                waterLevel = (p.waterLevel - p.species.waterDecayPerHour * elapsedHours).coerceIn(0.0, 1.0),
-                lightLevel = (p.lightLevel - p.species.lightDecayPerHour * elapsedHours).coerceIn(0.0, 1.0)
+                waterLevel = (p.waterLevel - p.species.waterDecayPerHour * weather.waterDecayMultiplier * elapsedHours).coerceIn(0.0, 1.0),
+                lightLevel = (p.lightLevel - p.species.lightDecayPerHour * weather.lightDecayMultiplier * elapsedHours).coerceIn(0.0, 1.0)
             )
         }
 
@@ -57,10 +61,10 @@ class TimeEngine {
         }
 
         if (p.isSick && !isShielded) {
-            p = p.copy(health = (p.health - p.species.healthDecayPerHour * 2 * elapsedHours).coerceIn(0.0, 1.0))
+            p = p.copy(health = (p.health - p.species.healthDecayPerHour * 2 * weather.healthDecayMultiplier * elapsedHours).coerceIn(0.0, 1.0))
         } else if (p.waterLevel < 0.3 || p.lightLevel < 0.3) {
             if (!isShielded) {
-                p = p.copy(health = (p.health - p.species.healthDecayPerHour * elapsedHours).coerceIn(0.0, 1.0))
+                p = p.copy(health = (p.health - p.species.healthDecayPerHour * weather.healthDecayMultiplier * elapsedHours).coerceIn(0.0, 1.0))
             }
         } else if (p.health < 1.0) {
             p = p.copy(health = (p.health + 0.01 * elapsedHours).coerceIn(0.0, 1.0))
@@ -75,7 +79,7 @@ class TimeEngine {
         var w = wallet
         if (p.growthStage != GrowthStage.WILTED && !p.isSick) {
             val nm = 1 + p.nutrients / 200
-            val eg = p.species.baseGrowthRate * p.waterLevel * p.lightLevel * p.health * nm * elapsedHours
+            val eg = p.species.baseGrowthRate * p.waterLevel * p.lightLevel * p.health * nm * p.currentWeather.growthMultiplier * elapsedHours
             p = p.copy(growthProgress = (p.growthProgress + eg).coerceIn(0.0, 1.0))
             if (p.growthProgress >= 1.0) {
                 val t = p.growthStage.evolutionThreshold
@@ -204,5 +208,14 @@ class TimeEngine {
             else -> SpriteMood.HAPPY
         }
         return sprite.withMood(mood)
+    }
+
+    private fun updateWeather(plant: PlantEntity, now: Long): PlantEntity {
+        val hoursSinceChange = (now - plant.lastWeatherChangeAt) / 3600000.0
+        if (hoursSinceChange >= 2.0 + Math.random() * 2.0) {
+            val newWeather = WeatherType.randomWeather(excluding = plant.currentWeather)
+            return plant.copy(currentWeatherRaw = newWeather.name, lastWeatherChangeAt = now)
+        }
+        return plant
     }
 }

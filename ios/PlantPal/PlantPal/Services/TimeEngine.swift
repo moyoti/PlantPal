@@ -32,11 +32,14 @@ final class TimeEngine {
         
         guard elapsedHours >= 0.01 else { return }
         
+        updateWeather(plant: plant, now: now)
+        
+        let weather = plant.currentWeather
         let isShielded = now < plant.shieldedUntil
         
         if !isShielded {
-            plant.waterLevel = max(0, min(1, plant.waterLevel - plant.species.waterDecayPerHour * elapsedHours))
-            plant.lightLevel = max(0, min(1, plant.lightLevel - plant.species.lightDecayPerHour * elapsedHours))
+            plant.waterLevel = max(0, min(1, plant.waterLevel - plant.species.waterDecayPerHour * weather.waterDecayMultiplier * elapsedHours))
+            plant.lightLevel = max(0, min(1, plant.lightLevel - plant.species.lightDecayPerHour * weather.lightDecayMultiplier * elapsedHours))
         }
         
         if plant.waterLevel < 0.2 && plant.lightLevel < 0.2 && !isShielded {
@@ -47,10 +50,10 @@ final class TimeEngine {
         }
         
         if plant.isSick && !isShielded {
-            plant.health = max(0, plant.health - plant.species.healthDecayPerHour * 2 * elapsedHours)
+            plant.health = max(0, plant.health - plant.species.healthDecayPerHour * 2 * weather.healthDecayMultiplier * elapsedHours)
         } else if plant.waterLevel < 0.3 || plant.lightLevel < 0.3 {
             if !isShielded {
-                plant.health = max(0, plant.health - plant.species.healthDecayPerHour * elapsedHours)
+                plant.health = max(0, plant.health - plant.species.healthDecayPerHour * weather.healthDecayMultiplier * elapsedHours)
             }
         } else if plant.health < 1.0 {
             plant.health = min(1, plant.health + 0.01 * elapsedHours)
@@ -64,7 +67,7 @@ final class TimeEngine {
         
         if plant.growthStage != .wilted && !plant.isSick {
             let nutrientMultiplier = 1 + plant.nutrients / 200
-            let effectiveGrowth = plant.species.baseGrowthRate * plant.waterLevel * plant.lightLevel * plant.health * nutrientMultiplier * elapsedHours
+            let effectiveGrowth = plant.species.baseGrowthRate * plant.waterLevel * plant.lightLevel * plant.health * nutrientMultiplier * weather.growthMultiplier * elapsedHours
             plant.growthProgress = min(1, plant.growthProgress + effectiveGrowth)
             
             if plant.growthProgress >= 1.0 {
@@ -194,6 +197,31 @@ final class TimeEngine {
         wallet?.coins += 3 + task.streakCount
     }
     
+    private func updateWeather(plant: Plant, now: Date) {
+        let hoursSinceChange = now.timeIntervalSince(plant.lastWeatherChangeAt) / 3600
+        if hoursSinceChange >= 2 + Double.random(in: 0...2) {
+            plant.currentWeather = WeatherType.randomWeather(excluding: plant.currentWeather)
+            plant.lastWeatherChangeAt = now
+        }
+    }
+
+    func checkDailyLogin(login: DailyLogin, wallet: PlayerWallet, now: Date = .now) -> Int {
+        let calendar = Calendar.current
+        let isSameDay = calendar.isDate(login.lastLoginDate, inSameDayAs: now)
+        
+        if isSameDay { return 0 }
+        
+        let isYesterday = calendar.isDate(calendar.date(byAdding: .day, value: -1, to: now)!, inSameDayAs: login.lastLoginDate)
+        login.consecutiveDays = isYesterday ? login.consecutiveDays + 1 : 1
+        login.totalLogins += 1
+        login.lastLoginDate = now
+        
+        let reward = login.todayReward
+        wallet.coins += reward
+        login.lastRewardClaimed = now
+        return reward
+    }
+
     private func deriveSpriteMood(sprite: Sprite, plant: Plant, now: Date) {
         let hour = Calendar.current.component(.hour, from: now)
         if hour >= 22 || hour < 7 {

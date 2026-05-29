@@ -230,3 +230,86 @@ enum class PetType {
             BUNNY_SPRITE -> "玩耍效果加倍，加速植物成长"
         }
 }
+
+enum class WeatherType {
+    SUNNY, CLOUDY, RAINY, STORMY, SNOWY;
+
+    val displayName: String
+        get() = when (this) {
+            SUNNY -> "晴天"
+            CLOUDY -> "多云"
+            RAINY -> "雨天"
+            STORMY -> "暴风"
+            SNOWY -> "雪天"
+        }
+
+    val emoji: String
+        get() = when (this) {
+            SUNNY -> "☀️"
+            CLOUDY -> "☁️"
+            RAINY -> "🌧️"
+            STORMY -> "⛈️"
+            SNOWY -> "❄️"
+        }
+
+    val waterDecayMultiplier: Double
+        get() = when (this) {
+            SUNNY -> 1.0; CLOUDY -> 0.9; RAINY -> 0.5; STORMY -> 1.2; SNOWY -> 0.6
+        }
+
+    val lightDecayMultiplier: Double
+        get() = when (this) {
+            SUNNY -> 0.8; CLOUDY -> 1.2; RAINY -> 1.3; STORMY -> 1.5; SNOWY -> 1.4
+        }
+
+    val healthDecayMultiplier: Double
+        get() = when (this) {
+            SUNNY -> 1.0; CLOUDY -> 1.0; RAINY -> 1.1; STORMY -> 1.5; SNOWY -> 1.0
+        }
+
+    val growthMultiplier: Double
+        get() = when (this) {
+            SUNNY -> 1.2; CLOUDY -> 1.0; RAINY -> 0.9; STORMY -> 0.3; SNOWY -> 0.0
+        }
+
+    companion object {
+        fun randomWeather(excluding: WeatherType? = null): WeatherType {
+            val weighted = listOf(SUNNY, SUNNY, CLOUDY, CLOUDY, RAINY, STORMY, SNOWY)
+                .filter { it != excluding }
+            return weighted.random()
+        }
+    }
+}
+
+enum class Achievement {
+    FIRST_WATER, GREEN_THUMB, SUNSHINE_LOVER, PLANT_WHISPERER,
+    EARLY_BIRD, DEDICATED, RICH_GARDENER, PET_LOVER,
+    PLANT_MASTER, HEALER, PROTECTOR, DANCER, SINGER, EXPLORER, LEGENDARY;
+
+    val displayName: String
+        get() = when (this) {
+            FIRST_WATER -> "初露锋芒"; GREEN_THUMB -> "绿手指"; SUNSHINE_LOVER -> "阳光爱好者"
+            PLANT_WHISPERER -> "植物语者"; EARLY_BIRD -> "早起鸟"; DEDICATED -> "坚持不懈"
+            RICH_GARDENER -> "富有园丁"; PET_LOVER -> "宠物达人"; PLANT_MASTER -> "植物大师"
+            HEALER -> "治愈之手"; PROTECTOR -> "守护者"; DANCER -> "舞者"
+            SINGER -> "歌唱家"; EXPLORER -> "探索者"; LEGENDARY -> "传奇园丁"
+        }
+
+    val description: String
+        get() = when (this) {
+            FIRST_WATER -> "第一次浇水"; GREEN_THUMB -> "浇水100次"; SUNSHINE_LOVER -> "光照100次"
+            PLANT_WHISPERER -> "互动500次"; EARLY_BIRD -> "连续登录7天"; DEDICATED -> "连续登录30天"
+            RICH_GARDENER -> "拥有1000金币"; PET_LOVER -> "拥有全部宠物"; PLANT_MASTER -> "植物达到结果阶段"
+            HEALER -> "治疗10次"; PROTECTOR -> "护盾10次"; DANCER -> "跳舞50次"
+            SINGER -> "唱歌50次"; EXPLORER -> "使用全部互动类型"; LEGENDARY -> "解锁所有其他成就"
+        }
+
+    val iconEmoji: String
+        get() = when (this) {
+            FIRST_WATER -> "💧"; GREEN_THUMB -> "🌱"; SUNSHINE_LOVER -> "☀️"
+            PLANT_WHISPERER -> "🌿"; EARLY_BIRD -> "🐦"; DEDICATED -> "🔥"
+            RICH_GARDENER -> "💰"; PET_LOVER -> "🐾"; PLANT_MASTER -> "🌳"
+            HEALER -> "💚"; PROTECTOR -> "🛡️"; DANCER -> "💃"
+            SINGER -> "🎤"; EXPLORER -> "🗺️"; LEGENDARY -> "👑"
+        }
+}
