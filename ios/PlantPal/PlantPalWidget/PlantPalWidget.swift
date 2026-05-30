@@ -140,7 +140,10 @@ struct WidgetStatBar: View {
 
 private func loadIcon(named: String) -> UIImage? {
     if let img = UIImage(named: named) { return img }
-    let parentURL = Bundle.main.bundleURL.deletingLastPathComponent().deletingLastPathComponent()
+    let parentURL = Bundle.main.bundleURL
+        .deletingLastPathComponent()
+        .deletingLastPathComponent()
+        .deletingLastPathComponent()
     guard let parentBundle = Bundle(url: parentURL) else { return nil }
     guard let url = parentBundle.url(forResource: named, withExtension: "png") else { return nil }
     guard let data = try? Data(contentsOf: url) else { return nil }
