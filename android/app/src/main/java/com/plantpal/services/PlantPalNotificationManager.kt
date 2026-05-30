@@ -17,13 +17,10 @@ class PlantPalNotificationManager(private val context: Context) {
 
     companion object {
         const val CHANNEL_PLANT_CARE = "plant_care"
-        const val CHANNEL_HABIT_REMINDER = "habit_reminder"
         const val CHANNEL_EVOLUTION = "evolution"
         const val ACTION_WATER_REMINDER = "com.plantpal.WATER_REMINDER"
-        const val ACTION_HABIT_REMINDER = "com.plantpal.HABIT_REMINDER"
         const val ACTION_EVOLUTION = "com.plantpal.EVOLUTION"
         const val EXTRA_PLANT_NAME = "plant_name"
-        const val EXTRA_TASK_TITLE = "task_title"
         const val EXTRA_NEW_STAGE = "new_stage"
     }
 
@@ -40,14 +37,6 @@ class PlantPalNotificationManager(private val context: Context) {
                 description = "浇水和光照提醒"
             }
 
-            val habitChannel = NotificationChannel(
-                CHANNEL_HABIT_REMINDER,
-                "习惯提醒",
-                NotificationManager.IMPORTANCE_DEFAULT
-            ).apply {
-                description = "每日习惯任务提醒"
-            }
-
             val evolutionChannel = NotificationChannel(
                 CHANNEL_EVOLUTION,
                 "进化通知",
@@ -56,7 +45,7 @@ class PlantPalNotificationManager(private val context: Context) {
                 description = "植物进化庆祝"
             }
 
-            notificationManager.createNotificationChannels(listOf(plantCareChannel, habitChannel, evolutionChannel))
+            notificationManager.createNotificationChannels(listOf(plantCareChannel, evolutionChannel))
         }
     }
 
@@ -80,34 +69,6 @@ class PlantPalNotificationManager(private val context: Context) {
             AlarmManager.RTC_WAKEUP,
             triggerAtMs,
             intervalMs,
-            pendingIntent
-        )
-    }
-
-    fun scheduleHabitReminder(taskTitle: String, hour: Int, minute: Int) {
-        val intent = Intent(context, NotificationReceiver::class.java).apply {
-            action = ACTION_HABIT_REMINDER
-            putExtra(EXTRA_TASK_TITLE, taskTitle)
-        }
-
-        val pendingIntent = PendingIntent.getBroadcast(
-            context,
-            taskTitle.hashCode(),
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-
-        val calendar = Calendar.getInstance().apply {
-            set(Calendar.HOUR_OF_DAY, hour)
-            set(Calendar.MINUTE, minute)
-            set(Calendar.SECOND, 0)
-            if (before(Calendar.getInstance())) add(Calendar.DAY_OF_YEAR, 1)
-        }
-
-        alarmManager.setRepeating(
-            AlarmManager.RTC_WAKEUP,
-            calendar.timeInMillis,
-            AlarmManager.INTERVAL_DAY,
             pendingIntent
         )
     }
@@ -143,7 +104,6 @@ class NotificationReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val plantName = intent.getStringExtra(PlantPalNotificationManager.EXTRA_PLANT_NAME) ?: "小绿"
-        val taskTitle = intent.getStringExtra(PlantPalNotificationManager.EXTRA_TASK_TITLE) ?: ""
 
         val notification = when (intent.action) {
             PlantPalNotificationManager.ACTION_WATER_REMINDER -> {
@@ -151,14 +111,6 @@ class NotificationReceiver : BroadcastReceiver() {
                     .setSmallIcon(R.drawable.ic_launcher_foreground)
                     .setContentTitle("🌿 $plantName 渴了")
                     .setContentText("快来给$plantName 浇水吧！")
-                    .setAutoCancel(true)
-                    .build()
-            }
-            PlantPalNotificationManager.ACTION_HABIT_REMINDER -> {
-                NotificationCompat.Builder(context, PlantPalNotificationManager.CHANNEL_HABIT_REMINDER)
-                    .setSmallIcon(R.drawable.ic_launcher_foreground)
-                    .setContentTitle("✅ 习惯提醒")
-                    .setContentText("今天「$taskTitle」完成了吗？完成可以获得养分哦！")
                     .setAutoCancel(true)
                     .build()
             }
