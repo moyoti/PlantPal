@@ -194,6 +194,7 @@ struct DecorationStoreView: View {
     }
     
     private func equipItem(_ item: DecorationItem) {
+        AudioManager.shared.playEquip()
         switch item.category {
         case .pot:
             let potName = item.assetName.replacingOccurrences(of: "pot_", with: "")
@@ -209,6 +210,7 @@ struct DecorationStoreView: View {
     
     private func purchaseItem(_ item: DecorationItem) {
         guard wallet.coins >= item.cost else { return }
+        AudioManager.shared.playPurchase()
         wallet.coins -= item.cost
         let owned = OwnedDecoration(itemId: item.id)
         modelContext.insert(owned)

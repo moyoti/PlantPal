@@ -6,13 +6,38 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.plantpal.data.entity.PlantEntity
+import com.plantpal.service.AudioManager
+import androidx.compose.ui.platform.LocalContext
 
 @Composable
 fun SettingsScreen(plant: PlantEntity?, onResetData: () -> Unit) {
     var notificationsEnabled by remember { mutableStateOf(true) }
     var waterReminderInterval by remember { mutableStateOf(4) }
+    var musicOn by remember { mutableStateOf(AudioManager.getMusicOn()) }
+    var sfxOn by remember { mutableStateOf(AudioManager.getSfxOn()) }
+    val context = LocalContext.current
 
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+        Text("音频", style = MaterialTheme.typography.titleMedium)
+        Spacer(Modifier.height(8.dp))
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            Text("背景音乐 🎵")
+            Switch(checked = musicOn, onCheckedChange = {
+                musicOn = it
+                AudioManager.setMusicOn(it)
+                if (it) AudioManager.startBGM(context) else AudioManager.stopBGM()
+            })
+        }
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            Text("音效 🔊")
+            Switch(checked = sfxOn, onCheckedChange = {
+                sfxOn = it
+                AudioManager.setSfxOn(it)
+            })
+        }
+
+        Spacer(Modifier.height(24.dp))
+
         Text("通知", style = MaterialTheme.typography.titleMedium)
         Spacer(Modifier.height(8.dp))
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {

@@ -74,6 +74,7 @@ struct GardenView: View {
             }
             startAmbientAnimations()
             checkDailyLoginReward()
+            AudioManager.shared.startBGM()
         }
         .onReceive(cooldownTimer) { _ in
             updateCooldowns()
@@ -412,6 +413,7 @@ struct GardenView: View {
         return Button(action: {
             guard !onCooldown else { return }
             timeEngine.applyInteraction(plant: plant, sprite: sprite, type: type, wallet: wallet)
+            AudioManager.shared.playInteractionSFX(type)
             updateCooldowns()
             checkAndUnlockAchievements(plant: plant, sprite: sprite)
             activeEffect = type
@@ -690,6 +692,7 @@ struct GardenView: View {
 
     private func handleSpriteTap(sprite: Sprite) {
         guard let plant else { return }
+        AudioManager.shared.playTap()
         withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
             spriteTapReaction = tapReactionText(for: sprite)
         }
@@ -823,6 +826,7 @@ struct GardenView: View {
     }
     
     private func tapPet(_ pet: Pet) {
+        AudioManager.shared.playSFX("pet")
         pet.friendshipLevel = min(1.0, pet.friendshipLevel + 0.03)
     }
 }

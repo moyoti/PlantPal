@@ -8,6 +8,8 @@ struct SettingsView: View {
     @AppStorage("waterReminderInterval") private var waterReminderInterval = 4
     @State private var showResetConfirm = false
     
+    private var audio: AudioManager { AudioManager.shared }
+    
     var body: some View {
         ZStack {
             LinearGradient(colors: [PixelPalette.greenBg, PixelPalette.cream], startPoint: .top, endPoint: .bottom)
@@ -16,6 +18,7 @@ struct SettingsView: View {
             ScrollView(showsIndicators: false) {
                 VStack(spacing: PixelSpacing.xl) {
                     pixelHeader
+                    audioSection
                     notificationSection
                     plantInfoSection
                     aboutSection
@@ -37,6 +40,23 @@ struct SettingsView: View {
             Rectangle().fill(PixelPalette.greenPrimary).frame(height: 3).frame(width: 60)
         }
         .frame(maxWidth: .infinity)
+    }
+    
+    private var audioSection: some View {
+        VStack(spacing: PixelSpacing.md) {
+            PixelSectionHeader(title: "音频")
+            VStack(spacing: PixelSpacing.sm) {
+                PixelToggle(isOn: Binding(
+                    get: { audio.isMusicOn },
+                    set: { _ in audio.toggleMusic() }
+                ), label: "背景音乐 🎵")
+                PixelToggle(isOn: Binding(
+                    get: { audio.isSfxOn },
+                    set: { audio.isSfxOn = $0 }
+                ), label: "音效 🔊")
+            }
+            .pixelCard()
+        }
     }
     
     private var notificationSection: some View {

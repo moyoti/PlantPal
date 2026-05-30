@@ -11,6 +11,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -25,6 +26,7 @@ import com.plantpal.engine.TimeEngine
 import com.plantpal.model.InteractionType
 import com.plantpal.model.PetType
 import com.plantpal.model.DecorationItem
+import com.plantpal.service.AudioManager
 import com.plantpal.ui.screens.*
 import com.plantpal.ui.theme.PlantPalTheme
 
@@ -43,6 +45,7 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlantPalApp() {
+    val context = LocalContext.current
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
@@ -70,6 +73,7 @@ fun PlantPalApp() {
             sprite = updatedSprite
             if (updatedWallet != null) wallet = updatedWallet
         }
+        AudioManager.startBGM(context)
     }
 
     Scaffold(
@@ -111,11 +115,13 @@ fun PlantPalApp() {
                             plant = p
                             sprite = s
                             if (w != null) wallet = w
+                            AudioManager.playInteractionSFX(context, type)
                         }
                     },
                     onSpriteTap = {
                         if (sprite != null) {
                             sprite = sprite!!.copy(happiness = (sprite!!.happiness + 0.03).coerceAtMost(1.0))
+                            AudioManager.playTap(context)
                         }
                     },
                     onPetTap = { pet ->
@@ -124,6 +130,7 @@ fun PlantPalApp() {
                             pets = pets.toMutableList().also {
                                 it[idx] = pet.copy(friendshipLevel = (pet.friendshipLevel + 0.03).coerceAtMost(1.0))
                             }
+                            AudioManager.playSFX(context, "pet")
                         }
                     }
                 )
@@ -162,6 +169,7 @@ fun PlantPalApp() {
                         if (wallet != null && wallet!!.coins >= item.cost) {
                             wallet = wallet!!.copy(coins = wallet!!.coins - item.cost)
                             ownedDecorationIds = ownedDecorationIds + item.id
+                            AudioManager.playPurchase(context)
                         }
                     },
                     onEquip = { item ->
@@ -179,6 +187,7 @@ fun PlantPalApp() {
                                 if (sprite != null) sprite = sprite!!.copy(outfit = outfitName)
                             }
                         }
+                        AudioManager.playEquip(context)
                     }
                 )
             }
