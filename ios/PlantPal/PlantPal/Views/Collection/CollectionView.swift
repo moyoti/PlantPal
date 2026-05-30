@@ -10,21 +10,24 @@ struct CollectionView: View {
     @Query private var achievements: [AchievementRecord]
     
     var body: some View {
-        ZStack {
-            LinearGradient(colors: [PixelPalette.greenBg, PixelPalette.cream], startPoint: .top, endPoint: .bottom)
-                .ignoresSafeArea()
-            ScrollView(showsIndicators: false) {
-                VStack(spacing: PixelSpacing.xl) {
-                    pixelHeader
-                    petShopSection
-                    achievementsSection
-                    if let plant = plants.first { currentPlantSection(plant) }
-                    if let sprite = sprites.first { spriteEvolutionSection(sprite) }
-                    decorationSection
+        NavigationStack {
+            ZStack {
+                LinearGradient(colors: [PixelPalette.greenBg, PixelPalette.cream], startPoint: .top, endPoint: .bottom)
+                    .ignoresSafeArea()
+                ScrollView(showsIndicators: false) {
+                    VStack(spacing: PixelSpacing.xl) {
+                        pixelHeader
+                        petShopSection
+                        achievementsSection
+                        if let plant = plants.first { currentPlantSection(plant) }
+                        if let sprite = sprites.first { spriteEvolutionSection(sprite) }
+                        decorationSection
+                    }
+                    .padding(PixelSpacing.lg)
+                    .padding(.bottom, 60)
                 }
-                .padding(PixelSpacing.lg)
-                .padding(.bottom, 60)
             }
+            .navigationBarHidden(true)
         }
     }
     
