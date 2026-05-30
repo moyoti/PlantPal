@@ -196,10 +196,6 @@ enum class SpriteEvolutionThreshold(val level: Int) {
     }
 }
 
-enum class TaskFrequency {
-    DAILY, WEEKLY, CUSTOM
-}
-
 enum class PetType {
     CAT_SPRITE, DOG_SPRITE, BIRD_SPRITE, FISH_SPRITE, BUNNY_SPRITE;
 

@@ -5,7 +5,6 @@ import com.plantpal.model.PlantSpecies
 import com.plantpal.model.GrowthStage
 import com.plantpal.model.SpriteMood
 import com.plantpal.model.InteractionType
-import com.plantpal.model.TaskFrequency
 import com.plantpal.model.PetType
 
 class Converters {
@@ -32,12 +31,6 @@ class Converters {
 
     @TypeConverter
     fun toInteractionType(value: String): InteractionType = try { InteractionType.valueOf(value) } catch (_: Exception) { InteractionType.WATER }
-
-    @TypeConverter
-    fun fromTaskFrequency(value: TaskFrequency): String = value.name
-
-    @TypeConverter
-    fun toTaskFrequency(value: String): TaskFrequency = try { TaskFrequency.valueOf(value) } catch (_: Exception) { TaskFrequency.DAILY }
 
     @TypeConverter
     fun fromPetType(value: PetType): String = value.name
