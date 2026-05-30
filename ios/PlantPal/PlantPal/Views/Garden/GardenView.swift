@@ -12,6 +12,7 @@ struct GardenView: View {
     @Query private var achievementRecords: [AchievementRecord]
     @State private var timeEngine = TimeEngine()
     @State private var activeEffect: InteractionType?
+    @Binding var pendingInteraction: InteractionType?
     @State private var cloudOffset: CGFloat = 0
     @State private var plantSway: CGFloat = 0
     @State private var spriteBob: CGFloat = 0
@@ -75,13 +76,24 @@ struct GardenView: View {
             startAmbientAnimations()
             checkDailyLoginReward()
             AudioManager.shared.startBGM()
+            updateWidgetData()
         }
         .onReceive(cooldownTimer) { _ in
             updateCooldowns()
+            updateWidgetData()
         }
         .onChange(of: sprites.first) { _, newSprite in
             if let newSprite, !spriteIsMoving {
                 spriteIsMoving = false
+            }
+        }
+        .onChange(of: pendingInteraction) { _, newType in
+            if let newType, let plant, let sprite {
+                timeEngine.applyInteraction(plant: plant, sprite: sprite, type: newType, wallet: wallet)
+                AudioManager.shared.playInteractionSFX(newType)
+                activeEffect = newType
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) { activeEffect = nil }
+                pendingInteraction = nil
             }
         }
     }
@@ -828,5 +840,20 @@ struct GardenView: View {
     private func tapPet(_ pet: Pet) {
         AudioManager.shared.playSFX("pet")
         pet.friendshipLevel = min(1.0, pet.friendshipLevel + 0.03)
+    }
+    
+    private func updateWidgetData() {
+        guard let defaults = UserDefaults(suiteName: "group.com.plantpal.app") else { return }
+        guard let plant, let sprite else { return }
+        defaults.set(plant.name, forKey: "plantName")
+        defaults.set(plant.health, forKey: "health")
+        defaults.set(plant.waterLevel, forKey: "waterLevel")
+        defaults.set(plant.lightLevel, forKey: "lightLevel")
+        defaults.set(sprite.moodRaw, forKey: "spriteMood")
+        defaults.set(sprite.evolutionLevel, forKey: "spriteEvolutionLevel")
+        defaults.set(sprite.happiness, forKey: "spriteHappiness")
+        defaults.set(wallet?.coins ?? 0, forKey: "coins")
+        let low = plant.waterLevel < 0.3 || plant.lightLevel < 0.3 || plant.health < 0.3 || sprite.happiness < 0.3
+        defaults.set(low, forKey: "needsAttention")
     }
 }

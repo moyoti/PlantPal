@@ -32,6 +32,7 @@ targets:
         INFOPLIST_KEY_UIApplicationSupportsMultipleScenes: NO
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
         INFOPLIST_KEY_CFBundleDevelopmentRegion: zh-Hans
+        INFOPLIST_KEY_CFBundleURLTypes: '[{"CFBundleURLSchemes":["plantpal"],"CFBundleURLName":"com.plantpal.app"}]'
         CODE_SIGN_ENTITLEMENTS: PlantPal/PlantPal.entitlements
         CODE_SIGN_IDENTITY: "Apple Development"
         DEVELOPMENT_TEAM: K4XY2L6L95
@@ -53,6 +54,7 @@ targets:
           - "**/.DS_Store"
           - "Info.plist"
       - path: PlantPal/Models/Models.swift
+      - path: PlantPal/Models/Decoration.swift
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.plantpal.app.PlantPalWidget
