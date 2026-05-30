@@ -147,8 +147,8 @@ struct CollectionView: View {
         let canAfford = (wallets.first?.coins ?? 0) >= petType.unlockCost
         
         return VStack(spacing: PixelSpacing.xs) {
-            Text(petTypeEmoji(for: petType))
-                .font(.system(size: 28))
+            AnimatedPetView(petType: petType, isHappy: isOwned)
+                .frame(width: 48, height: 48)
             
             Text(petType.displayName)
                 .font(PixelFonts.header(size: 9))
