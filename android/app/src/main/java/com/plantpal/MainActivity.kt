@@ -101,6 +101,7 @@ fun PlantPalApp() {
                     plant = plant,
                     sprite = sprite,
                     wallet = wallet,
+                    pets = pets,
                     cooldownState = timeEngine.cooldownState,
                     onInteraction = { type ->
                         if (plant != null && sprite != null) {
@@ -108,6 +109,19 @@ fun PlantPalApp() {
                             plant = p
                             sprite = s
                             if (w != null) wallet = w
+                        }
+                    },
+                    onSpriteTap = {
+                        if (sprite != null) {
+                            sprite = sprite!!.copy(happiness = (sprite!!.happiness + 0.03).coerceAtMost(1.0))
+                        }
+                    },
+                    onPetTap = { pet ->
+                        val idx = pets.indexOf(pet)
+                        if (idx >= 0) {
+                            pets = pets.toMutableList().also {
+                                it[idx] = pet.copy(friendshipLevel = (pet.friendshipLevel + 0.03).coerceAtMost(1.0))
+                            }
                         }
                     }
                 )

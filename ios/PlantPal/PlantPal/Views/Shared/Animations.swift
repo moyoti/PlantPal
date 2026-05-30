@@ -121,6 +121,35 @@ struct AnimatedSpriteView: View {
     }
 }
 
+struct AnimatedPetView: View {
+    let petType: PetType
+    let isHappy: Bool
+    @State private var currentFrameIndex: Int = 0
+    @State private var animationTask: Task<Void, Never>?
+    
+    private var frames: [String] {
+        let mood = isHappy ? "happy" : "idle"
+        return (1...4).map { "pet_\(petType.rawValue.replacingOccurrences(of: "_sprite", with: ""))_\(mood)_\($0)" }
+    }
+    
+    var body: some View {
+        let frameName = frames.indices.contains(currentFrameIndex) ? frames[currentFrameIndex] : frames[0]
+        PixelArtImage(name: frameName, size: .sprite)
+            .onAppear { startAnimation() }
+            .onChange(of: isHappy) { _, _ in currentFrameIndex = 0; startAnimation() }
+    }
+    
+    private func startAnimation() {
+        animationTask?.cancel()
+        animationTask = Task {
+            while !Task.isCancelled {
+                try? await Task.sleep(for: .milliseconds(250))
+                currentFrameIndex = (currentFrameIndex + 1) % frames.count
+            }
+        }
+    }
+}
+
 struct InteractionEffectView: View {
     let type: InteractionType
     @State private var isAnimating = false

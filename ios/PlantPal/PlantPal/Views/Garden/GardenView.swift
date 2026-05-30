@@ -21,6 +21,12 @@ struct GardenView: View {
     @State private var showStatusDetail = false
     @State private var showPetMenu = false
     @State private var dailyLoginReward: Int? = nil
+    @State private var spriteOffsetX: CGFloat = 0
+    @State private var spriteOffsetY: CGFloat = 0
+    @State private var spriteIsMoving = false
+    @State private var spriteTapReaction: String? = nil
+    @State private var petOffsets: [UUID: CGFloat] = [:]
+    @State private var petOffsetYs: [UUID: CGFloat] = [:]
     private let cooldownTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
     private var plant: Plant? { plants.first }
@@ -70,6 +76,11 @@ struct GardenView: View {
         .onReceive(cooldownTimer) { _ in
             updateCooldowns()
         }
+        .onChange(of: sprites.first) { _, newSprite in
+            if let newSprite, !spriteIsMoving {
+                spriteIsMoving = false
+            }
+        }
     }
 
     private func plantSceneView(_ plant: Plant, _ sprite: Sprite, geo: GeometryProxy) -> some View {
@@ -102,13 +113,36 @@ struct GardenView: View {
             }
 
             AnimatedSpriteView(evolutionLevel: sprite.evolutionLevel, mood: sprite.mood, outfitName: sprite.outfit)
-                .offset(x: geo.size.width * 0.18, y: -geo.size.height * 0.12 + spriteBob)
+                .offset(x: geo.size.width * 0.18 + spriteOffsetX, y: -geo.size.height * 0.12 + spriteBob + spriteOffsetY)
+                .onTapGesture {
+                    handleSpriteTap(sprite: sprite)
+                }
 
-            HStack(spacing: 8) {
+            if let reaction = spriteTapReaction {
+                Text(reaction)
+                    .font(.system(size: 20))
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(
+                        RoundedRectangle(cornerRadius: 8)
+                            .fill(Color.white.opacity(0.85))
+                            .overlay(RoundedRectangle(cornerRadius: 8).stroke(PixelPalette.greenPrimary.opacity(0.5), lineWidth: 1))
+                    )
+                    .offset(x: geo.size.width * 0.18 + spriteOffsetX, y: -geo.size.height * 0.22 + spriteBob + spriteOffsetY)
+                    .transition(.scale(scale: 0.5).combined(with: .opacity))
+            }
+
+            HStack(spacing: 12) {
                 ForEach(pets.filter { $0.isOwned }) { pet in
-                    Text(petEmoji(for: pet.petType))
-                        .font(.system(size: 20))
-                        .offset(y: -geo.size.height * 0.06 + sin(spriteBob * 1.5 + CGFloat(pets.filter { $0.isOwned }.firstIndex(where: { $0.id == pet.id }) ?? 0)) * 3)
+                    AnimatedPetView(petType: pet.petType, isHappy: pet.friendshipLevel > 0.5)
+                        .frame(width: 48, height: 48)
+                        .offset(
+                            x: (petOffsets[pet.id] ?? 0),
+                            y: -geo.size.height * 0.06 + sin(spriteBob * 1.5 + CGFloat(pets.filter { $0.isOwned }.firstIndex(where: { $0.id == pet.id }) ?? 0)) * 3 + (petOffsetYs[pet.id] ?? 0)
+                        )
+                        .onTapGesture {
+                            tapPet(pet)
+                        }
                 }
             }
             .offset(x: -geo.size.width * 0.22, y: -geo.size.height * 0.08)
@@ -119,6 +153,12 @@ struct GardenView: View {
         }
         .frame(width: geo.size.width, height: geo.size.height)
         .ignoresSafeArea()
+        .onAppear {
+            if !spriteIsMoving {
+                startSpriteWandering(geo: geo)
+                startPetWandering(geo: geo)
+            }
+        }
     }
 
     private func topOverlay(sprite: Sprite, plant: Plant, wallet: PlayerWallet?) -> some View {
@@ -230,8 +270,8 @@ struct GardenView: View {
             HStack(spacing: 8) {
                 ForEach(ownedPets) { pet in
                     HStack(spacing: 4) {
-                        Text(petEmoji(for: pet.petType))
-                            .font(.system(size: 18))
+                        AnimatedPetView(petType: pet.petType, isHappy: pet.friendshipLevel > 0.5)
+                            .frame(width: 32, height: 32)
                         VStack(spacing: 2) {
                             Text(pet.petType.displayName)
                                 .font(PixelFonts.header(size: 7))
@@ -620,5 +660,129 @@ struct GardenView: View {
         pet.lastPlayedAt = Date()
         pet.friendshipLevel = min(1.0, pet.friendshipLevel + 0.08)
         sprite.happiness = min(1.0, sprite.happiness + 0.1)
+    }
+
+    private func handleSpriteTap(sprite: Sprite) {
+        guard let plant else { return }
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
+            spriteTapReaction = tapReactionText(for: sprite)
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+            withAnimation { spriteTapReaction = nil }
+        }
+        switch sprite.mood {
+        case .excited, .happy:
+            sprite.happiness = min(1.0, sprite.happiness + 0.02)
+        case .worried, .sad:
+            sprite.happiness = min(1.0, sprite.happiness + 0.05)
+        case .sleeping:
+            break
+        }
+    }
+
+    private func tapReactionText(for sprite: Sprite) -> String {
+        switch sprite.mood {
+        case .excited: return ["❤️", "✨", "💕"][Int.random(in: 0..<3)]
+        case .happy: return ["😊", "🎵", "💛"][Int.random(in: 0..<3)]
+        case .worried: return ["🥺", "💧", "😔"][Int.random(in: 0..<3)]
+        case .sad: return ["😢", "💔", "🌧️"][Int.random(in: 0..<3)]
+        case .sleeping: return ["💤", "😴", "🌙"][Int.random(in: 0..<3)]
+        }
+    }
+
+    private func startSpriteWandering(geo: GeometryProxy) {
+        guard !spriteIsMoving else { return }
+        spriteIsMoving = true
+        wanderSprite(geo: geo)
+    }
+
+    private func wanderSprite(geo: GeometryProxy) {
+        guard let sprite else { return }
+        
+        switch sprite.mood {
+        case .sleeping:
+            withAnimation(.easeInOut(duration: 1.0)) {
+                spriteOffsetX = 0
+                spriteOffsetY = 0
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+                wanderSprite(geo: geo)
+            }
+            return
+        case .sad:
+            let shouldMove = Bool.random()
+            if !shouldMove {
+                DispatchQueue.main.asyncAfter(deadline: .now() + Double.random(in: 4.0...7.0)) {
+                    wanderSprite(geo: geo)
+                }
+                return
+            }
+        default:
+            break
+        }
+        
+        let speedMultiplier: Double
+        let rangeMultiplier: CGFloat
+        switch sprite.mood {
+        case .excited:
+            speedMultiplier = 0.5
+            rangeMultiplier = 1.3
+        case .happy:
+            speedMultiplier = 0.8
+            rangeMultiplier = 1.0
+        case .worried:
+            speedMultiplier = 1.5
+            rangeMultiplier = 0.5
+        case .sad:
+            speedMultiplier = 2.0
+            rangeMultiplier = 0.3
+        default:
+            speedMultiplier = 1.0
+            rangeMultiplier = 1.0
+        }
+        
+        let maxX: CGFloat = geo.size.width * 0.3 * rangeMultiplier
+        let maxY: CGFloat = geo.size.height * 0.08 * rangeMultiplier
+        let duration = Double.random(in: 2.0...5.0) * speedMultiplier
+
+        withAnimation(.easeInOut(duration: duration)) {
+            spriteOffsetX = CGFloat.random(in: -maxX...maxX)
+            spriteOffsetY = CGFloat.random(in: -maxY...maxY)
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + duration + Double.random(in: 1.0...3.0) * speedMultiplier) {
+            wanderSprite(geo: geo)
+        }
+    }
+    
+    private func startPetWandering(geo: GeometryProxy) {
+        let ownedPets = pets.filter { $0.isOwned }
+        for pet in ownedPets {
+            wanderPet(pet: pet, geo: geo)
+        }
+    }
+    
+    private func wanderPet(pet: Pet, geo: GeometryProxy) {
+        let rangeX: CGFloat = geo.size.width * 0.08
+        let rangeY: CGFloat = geo.size.height * 0.02
+        let duration = Double.random(in: 3.0...6.0)
+        
+        withAnimation(.easeInOut(duration: duration)) {
+            petOffsets[pet.id] = CGFloat.random(in: -rangeX...rangeX)
+            petOffsetYs[pet.id] = CGFloat.random(in: -rangeY...rangeY)
+        }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + duration + Double.random(in: 2.0...5.0)) {
+            if pet.isOwned {
+                wanderPet(pet: pet, geo: geo)
+            }
+        }
+    }
+    
+    private func tapPet(_ pet: Pet) {
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
+            petOffsets[pet.id] = (petOffsets[pet.id] ?? 0) + CGFloat.random(in: -5...5)
+        }
+        pet.friendshipLevel = min(1.0, pet.friendshipLevel + 0.03)
     }
 }

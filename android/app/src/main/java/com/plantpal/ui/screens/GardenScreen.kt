@@ -1,6 +1,7 @@
 package com.plantpal.ui.screens
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.*
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
@@ -29,9 +30,16 @@ import androidx.compose.ui.unit.sp
 import com.plantpal.data.entity.PlantEntity
 import com.plantpal.data.entity.SpriteEntity
 import com.plantpal.data.entity.PlayerWalletEntity
+import com.plantpal.data.entity.PetEntity
 import com.plantpal.engine.TimeEngine
 import com.plantpal.model.InteractionType
 import com.plantpal.model.SpriteMood
+import com.plantpal.model.PetType
+import com.plantpal.ui.components.AnimatedSpriteView
+import com.plantpal.ui.components.AnimatedPetView
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlin.random.Random
 
 object PixelPalette {
     val greenBg = Color(0xFFE8F5E9)
@@ -61,13 +69,17 @@ private val secondaryInteractions = listOf(
     InteractionType.TALK, InteractionType.SING, InteractionType.HEAL,
     InteractionType.PLAY, InteractionType.SHIELD, InteractionType.DANCE
 )
+
 @Composable
 fun GardenScreen(
     plant: PlantEntity?,
     sprite: SpriteEntity?,
     wallet: PlayerWalletEntity?,
+    pets: List<PetEntity> = emptyList(),
     cooldownState: TimeEngine.CooldownState,
-    onInteraction: (InteractionType) -> Unit
+    onInteraction: (InteractionType) -> Unit,
+    onSpriteTap: () -> Unit = {},
+    onPetTap: (PetEntity) -> Unit = {}
 ) {
     if (plant == null || sprite == null) {
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -78,9 +90,29 @@ fun GardenScreen(
 
     var showInteractionMenu by remember { mutableStateOf(false) }
     var showStatusDetail by remember { mutableStateOf(false) }
+    var spriteOffsetX by remember { mutableFloatStateOf(0f) }
+    var spriteOffsetY by remember { mutableFloatStateOf(0f) }
+    var spriteTapReaction by remember { mutableStateOf<String?>(null) }
+    val scope = rememberCoroutineScope()
 
     Box(modifier = Modifier.fillMaxSize()) {
-        FullscreenScene(plant, sprite)
+        FullscreenScene(
+            plant = plant,
+            sprite = sprite,
+            pets = pets,
+            spriteOffsetX = spriteOffsetX,
+            spriteOffsetY = spriteOffsetY,
+            spriteTapReaction = spriteTapReaction,
+            onSpriteTap = {
+                onSpriteTap()
+                scope.launch {
+                    spriteTapReaction = tapReactionText(sprite.mood)
+                    delay(1500)
+                    spriteTapReaction = null
+                }
+            },
+            onPetTap = onPetTap
+        )
         TopOverlay(
             sprite = sprite,
             plant = plant,
@@ -95,10 +127,54 @@ fun GardenScreen(
             onToggleMenu = { showInteractionMenu = !showInteractionMenu }
         )
     }
+
+    LaunchedEffect(sprite.mood) {
+        while (true) {
+            val delayMs = when (sprite.mood) {
+                SpriteMood.SLEEPING -> 3000L
+                SpriteMood.SAD -> if (Random.nextBoolean()) Random.nextLong(4000, 7000) else continue
+                SpriteMood.WORRIED -> Random.nextLong(3000, 5000)
+                SpriteMood.HAPPY -> Random.nextLong(2000, 4000)
+                SpriteMood.EXCITED -> Random.nextLong(1000, 3000)
+            }
+            delay(delayMs)
+            if (sprite.mood != SpriteMood.SLEEPING) {
+                val rangeMultiplier = when (sprite.mood) {
+                    SpriteMood.EXCITED -> 1.3f
+                    SpriteMood.HAPPY -> 1.0f
+                    SpriteMood.WORRIED -> 0.5f
+                    SpriteMood.SAD -> 0.3f
+                    else -> 1.0f
+                }
+                spriteOffsetX = Random.nextFloat() * 200f * rangeMultiplier - 100f * rangeMultiplier
+                spriteOffsetY = Random.nextFloat() * 60f * rangeMultiplier - 30f * rangeMultiplier
+            } else {
+                spriteOffsetX = 0f
+                spriteOffsetY = 0f
+            }
+        }
+    }
+}
+
+private fun tapReactionText(mood: SpriteMood): String = when (mood) {
+    SpriteMood.EXCITED -> listOf("❤️", "✨", "💕").random()
+    SpriteMood.HAPPY -> listOf("😊", "🎵", "💛").random()
+    SpriteMood.WORRIED -> listOf("🥺", "💧", "😔").random()
+    SpriteMood.SAD -> listOf("😢", "💔", "🌧️").random()
+    SpriteMood.SLEEPING -> listOf("💤", "😴", "🌙").random()
 }
 
 @Composable
-private fun FullscreenScene(plant: PlantEntity, sprite: SpriteEntity) {
+private fun FullscreenScene(
+    plant: PlantEntity,
+    sprite: SpriteEntity,
+    pets: List<PetEntity>,
+    spriteOffsetX: Float,
+    spriteOffsetY: Float,
+    spriteTapReaction: String?,
+    onSpriteTap: () -> Unit,
+    onPetTap: (PetEntity) -> Unit
+) {
     val context = LocalContext.current
     val bgResId = context.resources.getIdentifier(
         "bg_${plant.backgroundScene}", "drawable", context.packageName
@@ -141,16 +217,63 @@ private fun FullscreenScene(plant: PlantEntity, sprite: SpriteEntity) {
             }
             Spacer(Modifier.weight(1f))
         }
-        val spriteResId = context.resources.getIdentifier(
-            "sprite_${sprite.evolutionLevel}_${sprite.moodRaw.lowercase()}",
-            "drawable", context.packageName
+
+        AnimatedSpriteView(
+            evolutionLevel = sprite.evolutionLevel,
+            mood = sprite.mood,
+            modifier = Modifier
+                .offset(x = (72 + spriteOffsetX).dp, y = (-48 + spriteOffsetY).dp)
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                    onClick = onSpriteTap
+                )
         )
-        if (spriteResId != 0) {
-            Image(
-                painter = painterResource(id = spriteResId),
-                contentDescription = sprite.name,
-                modifier = Modifier.size(80.dp).offset(x = 72.dp, y = (-48).dp)
-            )
+
+        if (spriteTapReaction != null) {
+            Surface(
+                color = Color.White.copy(alpha = 0.85f),
+                shape = RoundedCornerShape(8.dp),
+                border = BorderStroke(1.dp, PixelPalette.greenPrimary.copy(alpha = 0.5f)),
+                modifier = Modifier.offset(x = (72 + spriteOffsetX).dp, y = (-100 + spriteOffsetY).dp)
+            ) {
+                Text(
+                    spriteTapReaction,
+                    fontSize = 18.sp,
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                )
+            }
+        }
+
+        Row(
+            modifier = Modifier.offset(x = (-88).dp, y = (-32).dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            pets.filter { it.isOwned }.forEachIndexed { index, pet ->
+                var petOffsetX by remember { mutableFloatStateOf(0f) }
+                var petOffsetY by remember { mutableFloatStateOf(0f) }
+
+                LaunchedEffect(pet.id) {
+                    while (true) {
+                        delay(Random.nextLong(3000, 6000))
+                        petOffsetX = Random.nextFloat() * 30f - 15f
+                        petOffsetY = Random.nextFloat() * 10f - 5f
+                    }
+                }
+
+                AnimatedPetView(
+                    petType = pet.petType,
+                    isHappy = pet.friendshipLevel > 0.5,
+                    modifier = Modifier
+                        .size(48.dp)
+                        .offset(x = petOffsetX.dp, y = petOffsetY.dp)
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null,
+                            onClick = { onPetTap(pet) }
+                        )
+                )
+            }
         }
     }
 }

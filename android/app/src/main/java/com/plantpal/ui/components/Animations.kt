@@ -11,12 +11,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.plantpal.model.SpriteMood
+import com.plantpal.model.PetType
 import kotlinx.coroutines.delay
 
-/**
- * Frame-based sprite animation data, matching iOS Animations.swift exactly.
- * Each evolution level has different frame counts per mood state.
- */
 data class SpriteAnimationData(
     val idleFrames: List<String>,
     val happyFrames: List<String>,
@@ -80,10 +77,6 @@ data class SpriteAnimationData(
     }
 }
 
-/**
- * Frame-based animated sprite view, cycling through PNG frames at the
- * specified duration, matching iOS AnimatedSpriteView behavior.
- */
 @Composable
 fun AnimatedSpriteView(
     evolutionLevel: Int,
@@ -94,7 +87,6 @@ fun AnimatedSpriteView(
     val frames = animationData.framesForMood(mood)
     var currentFrameIndex by remember { mutableIntStateOf(0) }
 
-    // Cycle through animation frames
     LaunchedEffect(frames) {
         currentFrameIndex = 0
         if (frames.size > 1) {
@@ -116,6 +108,41 @@ fun AnimatedSpriteView(
             painter = painterResource(id = resId),
             contentDescription = "Sprite level $evolutionLevel mood $mood",
             modifier = modifier.size(64.dp)
+        )
+    }
+}
+
+@Composable
+fun AnimatedPetView(
+    petType: PetType,
+    isHappy: Boolean,
+    modifier: Modifier = Modifier
+) {
+    val petPrefix = petType.name.lowercase().replace("_sprite", "")
+    val mood = if (isHappy) "happy" else "idle"
+    val frames = remember(petType, isHappy) { (1..4).map { "pet_${petPrefix}_${mood}_$it" } }
+    var currentFrameIndex by remember { mutableIntStateOf(0) }
+
+    LaunchedEffect(frames) {
+        if (frames.size > 1) {
+            while (true) {
+                delay(250L)
+                currentFrameIndex = (currentFrameIndex + 1) % frames.size
+            }
+        }
+    }
+
+    val frameName = frames.getOrElse(currentFrameIndex) { frames.first() }
+    val context = LocalContext.current
+    val resId = remember(frameName) {
+        context.resources.getIdentifier(frameName, "drawable", context.packageName)
+    }
+
+    if (resId != 0) {
+        Image(
+            painter = painterResource(id = resId),
+            contentDescription = "Pet $petType",
+            modifier = modifier
         )
     }
 }
