@@ -19,6 +19,8 @@ import com.plantpal.data.entity.PlayerWalletEntity
 import com.plantpal.data.entity.PetEntity
 import com.plantpal.data.entity.AchievementEntity
 import com.plantpal.data.entity.DailyLoginEntity
+import com.plantpal.data.entity.OwnedDecorationEntity
+import com.plantpal.data.dao.OwnedDecorationDao
 
 @Database(
     entities = [
@@ -28,9 +30,10 @@ import com.plantpal.data.entity.DailyLoginEntity
         PlayerWalletEntity::class,
         PetEntity::class,
         AchievementEntity::class,
-        DailyLoginEntity::class
+        DailyLoginEntity::class,
+        OwnedDecorationEntity::class
     ],
-    version = 4,
+    version = 5,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -42,6 +45,7 @@ abstract class PlantDatabase : RoomDatabase() {
     abstract fun petDao(): PetDao
     abstract fun achievementDao(): AchievementDao
     abstract fun dailyLoginDao(): DailyLoginDao
+    abstract fun ownedDecorationDao(): OwnedDecorationDao
 
     companion object {
         val MIGRATION_2_3 = object : Migration(2, 3) {
@@ -53,6 +57,11 @@ abstract class PlantDatabase : RoomDatabase() {
         val MIGRATION_3_4 = object : Migration(3, 4) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL("DROP TABLE IF EXISTS `habit_tasks`")
+            }
+        }
+        val MIGRATION_4_5 = object : Migration(4, 5) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("CREATE TABLE IF NOT EXISTS `owned_decorations` (`id` TEXT NOT NULL, `itemId` TEXT NOT NULL, `purchasedAt` INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(`id`))")
             }
         }
     }

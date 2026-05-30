@@ -19,6 +19,8 @@ import com.plantpal.data.entity.PlayerWalletEntity
 import com.plantpal.data.entity.SpriteEntity
 import com.plantpal.model.Achievement
 import com.plantpal.model.PetType
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 
 @Composable
 fun CollectionScreen(
@@ -27,7 +29,8 @@ fun CollectionScreen(
     wallet: PlayerWalletEntity?,
     pets: List<PetEntity>,
     achievements: List<AchievementEntity>,
-    onPurchasePet: (PetType) -> Unit
+    onPurchasePet: (PetType) -> Unit,
+    onNavigateToDecorationStore: () -> Unit = {}
 ) {
     if (plant == null || sprite == null) return
 
@@ -156,7 +159,24 @@ fun CollectionScreen(
             Spacer(Modifier.height(8.dp))
             Text("装饰", style = MaterialTheme.typography.titleMedium)
             Spacer(Modifier.height(8.dp))
-            Text("即将推出...", color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Card(
+                modifier = Modifier.fillMaxWidth().clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                    onClick = onNavigateToDecorationStore
+                )
+            ) {
+                Row(
+                    modifier = Modifier.padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text("🏪", fontSize = 20.sp)
+                    Spacer(Modifier.width(12.dp))
+                    Text("前往装饰商店", fontWeight = FontWeight.Medium)
+                    Spacer(Modifier.weight(1f))
+                    Text("›", fontSize = 18.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
         }
     }
 }

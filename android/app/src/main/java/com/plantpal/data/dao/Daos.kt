@@ -8,6 +8,7 @@ import com.plantpal.data.entity.PlayerWalletEntity
 import com.plantpal.data.entity.PetEntity
 import com.plantpal.data.entity.AchievementEntity
 import com.plantpal.data.entity.DailyLoginEntity
+import com.plantpal.data.entity.OwnedDecorationEntity
 
 @Dao
 interface PlantDao {
@@ -124,4 +125,16 @@ interface DailyLoginDao {
 
     @Update
     suspend fun update(dailyLogin: DailyLoginEntity)
+}
+
+@Dao
+interface OwnedDecorationDao {
+    @Query("SELECT * FROM owned_decorations")
+    fun getAllFlow(): kotlinx.coroutines.flow.Flow<List<OwnedDecorationEntity>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(entity: OwnedDecorationEntity)
+
+    @Query("DELETE FROM owned_decorations")
+    suspend fun deleteAll()
 }

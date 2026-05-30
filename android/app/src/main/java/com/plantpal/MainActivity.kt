@@ -24,6 +24,7 @@ import com.plantpal.data.entity.PlayerWalletEntity
 import com.plantpal.engine.TimeEngine
 import com.plantpal.model.InteractionType
 import com.plantpal.model.PetType
+import com.plantpal.model.DecorationItem
 import com.plantpal.ui.screens.*
 import com.plantpal.ui.theme.PlantPalTheme
 
@@ -51,6 +52,7 @@ fun PlantPalApp() {
     var wallet by remember { mutableStateOf<PlayerWalletEntity?>(null) }
     var pets by remember { mutableStateOf<List<PetEntity>>(emptyList()) }
     var achievements by remember { mutableStateOf<List<AchievementEntity>>(emptyList()) }
+    var ownedDecorationIds by remember { mutableStateOf<Set<String>>(emptySet()) }
     val timeEngine = remember { TimeEngine() }
 
     LaunchedEffect(Unit) {
@@ -138,7 +140,8 @@ fun PlantPalApp() {
                             wallet = wallet!!.copy(coins = wallet!!.coins - petType.unlockCost)
                             pets = pets + PetEntity(petTypeRaw = petType.name, isOwned = true, name = petType.displayName)
                         }
-                    }
+                    },
+                    onNavigateToDecorationStore = { navController.navigate("decoration_store") }
                 )
             }
             composable("settings") {
@@ -147,6 +150,37 @@ fun PlantPalApp() {
                     sprite = SpriteEntity()
                     wallet = PlayerWalletEntity()
                 }
+            }
+            composable("decoration_store") {
+                DecorationStoreScreen(
+                    coins = wallet?.coins ?: 0,
+                    ownedItemIds = ownedDecorationIds,
+                    equippedPot = plant?.potStyle ?: "default",
+                    equippedBg = plant?.backgroundScene ?: "garden",
+                    equippedOutfit = sprite?.outfit ?: "default",
+                    onPurchase = { item ->
+                        if (wallet != null && wallet!!.coins >= item.cost) {
+                            wallet = wallet!!.copy(coins = wallet!!.coins - item.cost)
+                            ownedDecorationIds = ownedDecorationIds + item.id
+                        }
+                    },
+                    onEquip = { item ->
+                        when (item.category) {
+                            com.plantpal.model.DecorationCategory.POT -> {
+                                val potName = item.assetName.removePrefix("pot_")
+                                if (plant != null) plant = plant!!.copy(potStyle = potName)
+                            }
+                            com.plantpal.model.DecorationCategory.BACKGROUND -> {
+                                val bgName = item.assetName.removePrefix("bg_")
+                                if (plant != null) plant = plant!!.copy(backgroundScene = bgName)
+                            }
+                            com.plantpal.model.DecorationCategory.OUTFIT -> {
+                                val outfitName = item.assetName.removePrefix("outfit_")
+                                if (sprite != null) sprite = sprite!!.copy(outfit = outfitName)
+                            }
+                        }
+                    }
+                )
             }
         }
     }

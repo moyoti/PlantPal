@@ -5,11 +5,17 @@ struct DecorationStoreView: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var ownedDecorations: [OwnedDecoration]
     @Query private var wallets: [PlayerWallet]
+    @Query private var plants: [Plant]
+    @Query private var sprites: [Sprite]
     @State private var selectedCategory: DecorationCategory = .pot
     @State private var showConfirmPurchase: DecorationItem?
     
     private var wallet: PlayerWallet { wallets.first ?? PlayerWallet.createDefault() }
     private var ownedItemIds: Set<String> { Set(ownedDecorations.map { $0.itemId }) }
+    
+    private var equippedPot: String { plants.first?.potStyle ?? "default" }
+    private var equippedBg: String { plants.first?.backgroundScene ?? "garden" }
+    private var equippedOutfit: String { sprites.first?.outfit ?? "default" }
     
     var body: some View {
         ZStack {
@@ -42,14 +48,14 @@ struct DecorationStoreView: View {
     
     private var walletBar: some View {
         HStack(spacing: PixelSpacing.sm) {
-            Circle().fill(PixelPalette.yellowSun).frame(width: 20, height: 20)
-                .overlay(Text("$").font(PixelFonts.header(size: 8)).foregroundColor(.white))
-            Text("\(wallet.coins)").font(PixelFonts.header(size: 14)).foregroundColor(PixelPalette.darkText)
+            Circle().fill(PixelPalette.coinGold).frame(width: 20, height: 20)
+                .overlay(Circle().stroke(PixelPalette.yellowSunDark, lineWidth: 1))
+            Text("¥\(wallet.coins)").font(PixelFonts.header(size: 12)).foregroundColor(PixelPalette.coinGold)
             Spacer()
         }
         .padding(PixelSpacing.sm)
         .background(Color.white.opacity(0.6))
-        .overlay(PixelBorder(thickness: 2, cornerSize: 4).stroke(PixelPalette.yellowSun, lineWidth: 2))
+        .overlay(PixelBorder(thickness: 2, cornerSize: 4).stroke(PixelPalette.coinGold.opacity(0.5), lineWidth: 2))
     }
     
     private var categoryPicker: some View {
@@ -84,39 +90,64 @@ struct DecorationStoreView: View {
     }
     
     private func decorationCard(item: DecorationItem) -> some View {
-        let isOwned = ownedItemIds.contains(item.id)
+        let isOwned = ownedItemIds.contains(item.id) || item.isUnlockedByDefault
         let canAfford = wallet.coins >= item.cost
+        let isEquipped = isItemEquipped(item)
         
         return VStack(spacing: PixelSpacing.sm) {
             ZStack {
                 RoundedRectangle(cornerRadius: 2)
                     .fill(PixelPalette.cream)
                     .frame(height: 70)
-                    .overlay(RoundedRectangle(cornerRadius: 2).stroke(PixelPalette.cardBorder, lineWidth: 2))
+                    .overlay(RoundedRectangle(cornerRadius: 2).stroke(isEquipped ? PixelPalette.greenPrimary : PixelPalette.cardBorder, lineWidth: isEquipped ? 3 : 2))
                 
-                if hasAsset(for: item) {
-                    PixelArtImage(name: item.assetName, size: .icon)
-                } else {
-                    Text(item.category.icon).font(.system(size: 28))
+                PixelArtImage(name: item.assetName, size: .icon)
+                
+                if isEquipped {
+                    VStack {
+                        HStack {
+                            Spacer()
+                            Text("✓")
+                                .font(PixelFonts.header(size: 8))
+                                .foregroundColor(.white)
+                                .padding(2)
+                                .background(PixelPalette.greenPrimary)
+                                .overlay(RoundedRectangle(cornerRadius: 1).stroke(PixelPalette.greenDark, lineWidth: 1))
+                        }
+                        Spacer()
+                    }
+                    .padding(4)
                 }
             }
             
             Text(item.name).font(PixelFonts.body(size: 11)).foregroundColor(PixelPalette.darkText)
             
-            if isOwned {
-                PixelBadge(text: "已拥有", color: PixelPalette.greenPrimary)
+            if isOwned && !isEquipped {
+                Button { equipItem(item) } label: {
+                    Text("装备")
+                        .font(PixelFonts.header(size: 8))
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 4)
+                        .background(PixelPalette.greenPrimary)
+                        .overlay(PixelBorder(thickness: 2, cornerSize: 2).stroke(PixelPalette.greenDark, lineWidth: 2))
+                }
+                .buttonStyle(.plain)
+            } else if isEquipped {
+                PixelBadge(text: "使用中", color: PixelPalette.greenPrimary)
             } else if item.isUnlockedByDefault {
                 PixelBadge(text: "默认", color: PixelPalette.mutedText)
             } else {
                 Button { showConfirmPurchase = item } label: {
                     HStack(spacing: 2) {
-                        Circle().fill(PixelPalette.yellowSun).frame(width: 10, height: 10)
+                        Circle().fill(PixelPalette.coinGold).frame(width: 10, height: 10)
+                            .overlay(Circle().stroke(PixelPalette.yellowSunDark, lineWidth: 1))
                         Text("\(item.cost)").font(PixelFonts.header(size: 8))
                     }
                     .foregroundColor(canAfford ? PixelPalette.darkText : PixelPalette.mutedText)
                     .padding(.horizontal, 6).padding(.vertical, 3)
-                    .background(canAfford ? PixelPalette.yellowSun.opacity(0.15) : PixelPalette.cream)
-                    .overlay(PixelBorder(thickness: 1, cornerSize: 2).stroke(canAfford ? PixelPalette.yellowSun : PixelPalette.cardBorder, lineWidth: 1))
+                    .background(canAfford ? PixelPalette.coinGold.opacity(0.15) : PixelPalette.cream)
+                    .overlay(PixelBorder(thickness: 1, cornerSize: 2).stroke(canAfford ? PixelPalette.coinGold : PixelPalette.cardBorder, lineWidth: 1))
                 }
                 .buttonStyle(.plain)
                 .disabled(!canAfford)
@@ -135,6 +166,7 @@ struct DecorationStoreView: View {
                     PixelButton(icon: "xmark", label: "取消", color: PixelPalette.mutedText) { showConfirmPurchase = nil }
                     PixelButton(icon: "checkmark", label: "确认", color: PixelPalette.greenPrimary) {
                         purchaseItem(item)
+                        equipItem(item)
                         showConfirmPurchase = nil
                     }
                 }
@@ -153,11 +185,26 @@ struct DecorationStoreView: View {
         }
     }
     
-private func hasAsset(for item: DecorationItem) -> Bool {
-        let potAssets = ["pot_default", "pot_wooden", "pot_ceramic", "pot_crystal", "pot_golden"]
-        let bgAssets = ["bg_garden", "bg_forest", "bg_beach", "bg_night", "bg_rainbow"]
-        let outfitAssets = ["outfit_default", "outfit_crown", "outfit_scarf", "outfit_glasses", "outfit_wings", "outfit_party_hat"]
-        return potAssets.contains(item.assetName) || bgAssets.contains(item.assetName) || outfitAssets.contains(item.assetName)
+    private func isItemEquipped(_ item: DecorationItem) -> Bool {
+        switch item.category {
+        case .pot: return item.assetName == "pot_\(equippedPot)"
+        case .background: return item.assetName == "bg_\(equippedBg)"
+        case .outfit: return item.assetName == "outfit_\(equippedOutfit)"
+        }
+    }
+    
+    private func equipItem(_ item: DecorationItem) {
+        switch item.category {
+        case .pot:
+            let potName = item.assetName.replacingOccurrences(of: "pot_", with: "")
+            plants.first?.potStyle = potName
+        case .background:
+            let bgName = item.assetName.replacingOccurrences(of: "bg_", with: "")
+            plants.first?.backgroundScene = bgName
+        case .outfit:
+            let outfitName = item.assetName.replacingOccurrences(of: "outfit_", with: "")
+            sprites.first?.outfit = outfitName
+        }
     }
     
     private func purchaseItem(_ item: DecorationItem) {
