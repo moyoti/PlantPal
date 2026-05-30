@@ -190,6 +190,26 @@ final class TimeEngine {
         deriveSpriteMood(sprite: sprite, plant: plant, now: now)
     }
     
+    func applyPetAbility(pet: Pet, plant: Plant, sprite: Sprite, wallet: PlayerWallet?) {
+        let bonus = 0.05 + pet.friendshipLevel * 0.1
+        switch pet.petType {
+        case .cat_sprite:
+            wallet?.coins += Int(5 * (1 + pet.friendshipLevel))
+        case .dog_sprite:
+            plant.health = min(1.0, plant.health + bonus)
+            sprite.happiness = min(1.0, sprite.happiness + bonus * 0.5)
+        case .bird_sprite:
+            sprite.happiness = min(1.0, sprite.happiness + bonus)
+            wallet?.coins += 3
+        case .fish_sprite:
+            plant.waterLevel = min(1.0, plant.waterLevel + bonus)
+            sprite.fatigue = max(0, sprite.fatigue - bonus * 0.5)
+        case .bunny_sprite:
+            sprite.fatigue = max(0, sprite.fatigue - bonus)
+            plant.growthProgress = min(1.0, plant.growthProgress + bonus * 0.3)
+        }
+    }
+    
     func checkAchievements(plant: Plant, sprite: Sprite, wallet: PlayerWallet?, records: [AchievementRecord], pets: [Pet], interactionCounts: [InteractionType: Int]) -> [Achievement] {
         let unlocked = Set(records.filter { $0.isUnlocked }.map { $0.achievementIdRaw })
         var newlyUnlocked: [Achievement] = []

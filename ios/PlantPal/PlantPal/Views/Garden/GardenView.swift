@@ -19,6 +19,7 @@ struct GardenView: View {
     @State private var cooldownTimers: [InteractionType: Double] = [:]
     @State private var showInteractionMenu = false
     @State private var showStatusDetail = false
+    @State private var showPetMenu = false
     @State private var dailyLoginReward: Int? = nil
     private let cooldownTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
@@ -45,8 +46,11 @@ struct GardenView: View {
                 }
 
                 if let plant, let sprite {
-                    topOverlay(sprite: sprite, plant: plant, wallet: wallet)
-                    bottomOverlay(plant: plant, sprite: sprite)
+                    VStack(spacing: 0) {
+                        topOverlay(sprite: sprite, plant: plant, wallet: wallet)
+                        Spacer()
+                        bottomOverlay(plant: plant, sprite: sprite)
+                    }
                 }
                 
                 if let reward = dailyLoginReward {
@@ -99,6 +103,15 @@ struct GardenView: View {
 
             AnimatedSpriteView(evolutionLevel: sprite.evolutionLevel, mood: sprite.mood, outfitName: sprite.outfit)
                 .offset(x: geo.size.width * 0.18, y: -geo.size.height * 0.12 + spriteBob)
+
+            HStack(spacing: 8) {
+                ForEach(pets.filter { $0.isOwned }) { pet in
+                    Text(petEmoji(for: pet.petType))
+                        .font(.system(size: 20))
+                        .offset(y: -geo.size.height * 0.06 + sin(spriteBob * 1.5 + CGFloat(pets.filter { $0.isOwned }.firstIndex(where: { $0.id == pet.id }) ?? 0)) * 3)
+                }
+            }
+            .offset(x: -geo.size.width * 0.22, y: -geo.size.height * 0.08)
 
             if let effect = activeEffect {
                 InteractionEffectView(type: effect)
@@ -190,8 +203,6 @@ struct GardenView: View {
                 .padding(.bottom, 8)
                 .transition(.opacity.combined(with: .move(edge: .top)))
             }
-
-            Spacer()
         }
         .background(
             LinearGradient(
@@ -199,18 +210,60 @@ struct GardenView: View {
                 startPoint: .top, endPoint: .bottom
             )
         )
-        .frame(height: showStatusDetail ? 140 : 56)
-        .clipped()
     }
 
     private func bottomOverlay(plant: Plant, sprite: Sprite) -> some View {
         VStack(spacing: 0) {
-            Spacer()
             if showInteractionMenu {
                 secondaryMenu(plant: plant, sprite: sprite)
             }
+            if showPetMenu {
+                petActionBar
+            }
             primaryBar(plant: plant, sprite: sprite)
         }
+    }
+
+    private var petActionBar: some View {
+        let ownedPets = pets.filter { $0.isOwned }
+        return ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                ForEach(ownedPets) { pet in
+                    HStack(spacing: 4) {
+                        Text(petEmoji(for: pet.petType))
+                            .font(.system(size: 18))
+                        VStack(spacing: 2) {
+                            Text(pet.petType.displayName)
+                                .font(PixelFonts.header(size: 7))
+                                .foregroundColor(.white)
+                            HStack(spacing: 6) {
+                                Button { feedPet(pet) } label: {
+                                    VStack(spacing: 1) {
+                                        Text("🍖").font(.system(size: 14))
+                                        Text("喂食").font(PixelFonts.header(size: 5)).foregroundColor(.white.opacity(0.8))
+                                    }
+                                }
+                                .buttonStyle(.plain)
+                                Button { playWithPet(pet) } label: {
+                                    VStack(spacing: 1) {
+                                        Text("⚽").font(.system(size: 14))
+                                        Text("玩耍").font(PixelFonts.header(size: 5)).foregroundColor(.white.opacity(0.8))
+                                    }
+                                }
+                                .buttonStyle(.plain)
+                            }
+                        }
+                    }
+                    .padding(6)
+                    .background(Color.black.opacity(0.4))
+                    .overlay(RoundedRectangle(cornerRadius: 4).stroke(PixelPalette.greenPrimary.opacity(0.5), lineWidth: 1))
+                }
+            }
+            .padding(.horizontal, 16)
+        }
+        .padding(.vertical, 6)
+        .background(Color.black.opacity(0.3))
+        .transition(.move(edge: .bottom).combined(with: .opacity))
     }
 
     private func secondaryMenu(plant: Plant, sprite: Sprite) -> some View {
@@ -267,14 +320,21 @@ struct GardenView: View {
                 .frame(maxWidth: .infinity)
             }
             .buttonStyle(.plain)
+
+            if !pets.filter(\.isOwned).isEmpty {
+                Button {
+                    withAnimation(.spring(response: 0.35, dampingFraction: 0.75)) {
+                        showPetMenu.toggle()
+                    }
+                } label: {
+                    VStack(spacing: 2) {
+                        Text("🐾").font(.system(size: 16))
+                        Text("宠物").font(PixelFonts.header(size: 6)).foregroundColor(.white.opacity(0.8))
+                    }
+                }
+                .buttonStyle(.plain)
+            }
         }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 8)
-        .background(
-            RoundedRectangle(cornerRadius: 10)
-                .fill(Color.black.opacity(0.5))
-                .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.white.opacity(0.2), lineWidth: 1))
-        )
         .padding(.horizontal, 12)
         .padding(.bottom, 4)
     }
@@ -536,5 +596,29 @@ struct GardenView: View {
             modelContext.insert(record)
             wallet?.coins += 10
         }
+    }
+
+    private func petEmoji(for type: PetType) -> String {
+        switch type {
+        case .cat_sprite: return "🐱"
+        case .dog_sprite: return "🐶"
+        case .bird_sprite: return "🐦"
+        case .fish_sprite: return "🐟"
+        case .bunny_sprite: return "🐰"
+        }
+    }
+
+    private func feedPet(_ pet: Pet) {
+        guard let plant, let sprite else { return }
+        pet.lastFedAt = Date()
+        pet.friendshipLevel = min(1.0, pet.friendshipLevel + 0.05)
+        timeEngine.applyPetAbility(pet: pet, plant: plant, sprite: sprite, wallet: wallet)
+    }
+
+    private func playWithPet(_ pet: Pet) {
+        guard let plant, let sprite else { return }
+        pet.lastPlayedAt = Date()
+        pet.friendshipLevel = min(1.0, pet.friendshipLevel + 0.08)
+        sprite.happiness = min(1.0, sprite.happiness + 0.1)
     }
 }
