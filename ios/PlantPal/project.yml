@@ -58,6 +58,10 @@ targets:
           - "Info.plist"
       - path: PlantPal/Models/Models.swift
       - path: PlantPal/Models/Decoration.swift
+    resources:
+      - path: PlantPal/Resources/Sprites
+        excludes:
+          - "**/.DS_Store"
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.plantpal.app.PlantPalWidget
