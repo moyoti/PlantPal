@@ -44,6 +44,9 @@ targets:
       path: PlantPal/PlantPal.entitlements
       properties:
         com.apple.security.app-sandbox: false
+    dependencies:
+      - target: PlantPalWidget
+        embed: true
 
   PlantPalWidget:
     type: app-extension
@@ -70,5 +73,3 @@ targets:
       path: PlantPalWidget/PlantPalWidget.entitlements
       properties:
         com.apple.security.app-sandbox: false
-    dependencies:
-      - target: PlantPal
