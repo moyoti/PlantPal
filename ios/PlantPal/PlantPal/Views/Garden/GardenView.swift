@@ -25,8 +25,9 @@ struct GardenView: View {
     @State private var spriteOffsetY: CGFloat = 0
     @State private var spriteIsMoving = false
     @State private var spriteTapReaction: String? = nil
-    @State private var petOffsets: [UUID: CGFloat] = [:]
-    @State private var petOffsetYs: [UUID: CGFloat] = [:]
+    @State private var petPositions: [UUID: CGPoint] = [:]
+    @State private var petIsDragging: [UUID: Bool] = [:]
+    @State private var petWanderJob: [UUID: Bool] = [:]
     private let cooldownTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
     private var plant: Plant? { plants.first }
@@ -132,20 +133,47 @@ struct GardenView: View {
                     .transition(.scale(scale: 0.5).combined(with: .opacity))
             }
 
-            HStack(spacing: 12) {
-                ForEach(pets.filter { $0.isOwned }) { pet in
-                    AnimatedPetView(petType: pet.petType, isHappy: pet.friendshipLevel > 0.5)
-                        .frame(width: 48, height: 48)
-                        .offset(
-                            x: (petOffsets[pet.id] ?? 0),
-                            y: -geo.size.height * 0.06 + sin(spriteBob * 1.5 + CGFloat(pets.filter { $0.isOwned }.firstIndex(where: { $0.id == pet.id }) ?? 0)) * 3 + (petOffsetYs[pet.id] ?? 0)
-                        )
-                        .onTapGesture {
+            ForEach(pets.filter { $0.isOwned }) { pet in
+                let pos = petPositions[pet.id] ?? CGPoint(
+                    x: geo.size.width * 0.28,
+                    y: geo.size.height * 0.58
+                )
+                AnimatedPetView(petType: pet.petType, isHappy: pet.friendshipLevel > 0.5)
+                    .frame(width: 48, height: 48)
+                    .position(pos)
+                    .gesture(
+                        DragGesture(coordinateSpace: .local)
+                            .onChanged { value in
+                                if petIsDragging[pet.id] != true {
+                                    petIsDragging[pet.id] = true
+                                    petWanderJob[pet.id] = false
+                                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                }
+                                let newX = pos.x + value.translation.width
+                                let newY = pos.y + value.translation.height
+                                petPositions[pet.id] = CGPoint(
+                                    x: min(max(24, newX), geo.size.width - 24),
+                                    y: min(max(24, newY), geo.size.height - 24)
+                                )
+                            }
+                            .onEnded { _ in
+                                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                                petIsDragging[pet.id] = false
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                                    petWanderJob[pet.id] = true
+                                    wanderPet(pet: pet, geo: geo)
+                                }
+                            }
+                    )
+                    .onTapGesture {
+                        if petIsDragging[pet.id] != true {
+                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
                             tapPet(pet)
                         }
-                }
+                    }
+                    .scaleEffect(petIsDragging[pet.id] == true ? 1.2 : 1.0)
+                    .animation(.spring(response: 0.2, dampingFraction: 0.7), value: petIsDragging[pet.id])
             }
-            .offset(x: -geo.size.width * 0.22, y: -geo.size.height * 0.08)
 
             if let effect = activeEffect {
                 InteractionEffectView(type: effect)
@@ -757,19 +785,36 @@ struct GardenView: View {
     
     private func startPetWandering(geo: GeometryProxy) {
         let ownedPets = pets.filter { $0.isOwned }
-        for pet in ownedPets {
+        for (index, pet) in ownedPets.enumerated() {
+            if petPositions[pet.id] == nil {
+                petPositions[pet.id] = CGPoint(
+                    x: geo.size.width * 0.28 - CGFloat(index) * 40,
+                    y: geo.size.height * 0.58
+                )
+            }
+            petWanderJob[pet.id] = true
             wanderPet(pet: pet, geo: geo)
         }
     }
     
     private func wanderPet(pet: Pet, geo: GeometryProxy) {
-        let rangeX: CGFloat = geo.size.width * 0.08
-        let rangeY: CGFloat = geo.size.height * 0.02
+        guard petWanderJob[pet.id] == true, petIsDragging[pet.id] != true else {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                wanderPet(pet: pet, geo: geo)
+            }
+            return
+        }
+        
+        let current = petPositions[pet.id] ?? CGPoint(x: geo.size.width * 0.28, y: geo.size.height * 0.58)
+        let rangeX: CGFloat = geo.size.width * 0.06
+        let rangeY: CGFloat = geo.size.height * 0.03
         let duration = Double.random(in: 3.0...6.0)
         
+        let newX = min(max(24, current.x + CGFloat.random(in: -rangeX...rangeX)), geo.size.width - 24)
+        let newY = min(max(24, current.y + CGFloat.random(in: -rangeY...rangeY)), geo.size.height - 24)
+        
         withAnimation(.easeInOut(duration: duration)) {
-            petOffsets[pet.id] = CGFloat.random(in: -rangeX...rangeX)
-            petOffsetYs[pet.id] = CGFloat.random(in: -rangeY...rangeY)
+            petPositions[pet.id] = CGPoint(x: newX, y: newY)
         }
         
         DispatchQueue.main.asyncAfter(deadline: .now() + duration + Double.random(in: 2.0...5.0)) {
@@ -780,9 +825,6 @@ struct GardenView: View {
     }
     
     private func tapPet(_ pet: Pet) {
-        withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
-            petOffsets[pet.id] = (petOffsets[pet.id] ?? 0) + CGFloat.random(in: -5...5)
-        }
         pet.friendshipLevel = min(1.0, pet.friendshipLevel + 0.03)
     }
 }

@@ -1,5 +1,7 @@
 package com.plantpal.ui.screens
 
+import android.os.Build
+import android.view.HapticFeedbackConstants
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.*
 import androidx.compose.animation.fadeIn
@@ -11,6 +13,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -19,10 +22,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -245,35 +252,81 @@ private fun FullscreenScene(
             }
         }
 
-        Row(
-            modifier = Modifier.offset(x = (-88).dp, y = (-32).dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            pets.filter { it.isOwned }.forEachIndexed { index, pet ->
-                var petOffsetX by remember { mutableFloatStateOf(0f) }
-                var petOffsetY by remember { mutableFloatStateOf(0f) }
+        pets.filter { it.isOwned }.forEachIndexed { index, pet ->
+            val view = LocalView.current
+            var isDragging by remember { mutableStateOf(false) }
+            var isWandering by remember { mutableStateOf(true) }
+            var petX by remember(pet.id) { mutableFloatStateOf(-88f - index * 40f) }
+            var petY by remember(pet.id) { mutableFloatStateOf(-32f) }
+            var containerWidth by remember { mutableFloatStateOf(0f) }
+            var containerHeight by remember { mutableFloatStateOf(0f) }
 
-                LaunchedEffect(pet.id) {
+            LaunchedEffect(pet.id, isWandering) {
+                if (isWandering) {
                     while (true) {
                         delay(Random.nextLong(3000, 6000))
-                        petOffsetX = Random.nextFloat() * 30f - 15f
-                        petOffsetY = Random.nextFloat() * 10f - 5f
+                        petX += Random.nextFloat() * 30f - 15f
+                        petY += Random.nextFloat() * 10f - 5f
                     }
                 }
-
-                AnimatedPetView(
-                    petType = pet.petType,
-                    isHappy = pet.friendshipLevel > 0.5,
-                    modifier = Modifier
-                        .size(48.dp)
-                        .offset(x = petOffsetX.dp, y = petOffsetY.dp)
-                        .clickable(
-                            interactionSource = remember { MutableInteractionSource() },
-                            indication = null,
-                            onClick = { onPetTap(pet) }
-                        )
-                )
             }
+
+            AnimatedPetView(
+                petType = pet.petType,
+                isHappy = pet.friendshipLevel > 0.5,
+                modifier = Modifier
+                    .size(if (isDragging) 58.dp else 48.dp)
+                    .offset(x = petX.dp, y = petY.dp)
+                    .onSizeChanged { size ->
+                        containerWidth = size.width.toFloat()
+                        containerHeight = size.height.toFloat()
+                    }
+                    .pointerInput(Unit) {
+                        detectDragGestures(
+                            onDragStart = {
+                                isDragging = true
+                                isWandering = false
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+                                    view.performHapticFeedback(HapticFeedbackConstants.TEXT_HANDLE_MOVE)
+                                } else {
+                                    view.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+                                }
+                            },
+                            onDrag = { change, dragAmount ->
+                                change.consume()
+                                petX += dragAmount.x / density
+                                petY += dragAmount.y / density
+                            },
+                            onDragEnd = {
+                                isDragging = false
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                    view.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
+                                } else {
+                                    view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+                                }
+                                isWandering = true
+                            },
+                            onDragCancel = {
+                                isDragging = false
+                                isWandering = true
+                            }
+                        )
+                    }
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        onClick = {
+                            if (!isDragging) {
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+                                    view.performHapticFeedback(HapticFeedbackConstants.TEXT_HANDLE_MOVE)
+                                } else {
+                                    view.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+                                }
+                                onPetTap(pet)
+                            }
+                        }
+                    )
+            )
         }
     }
 }
