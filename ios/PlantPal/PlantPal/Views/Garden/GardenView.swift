@@ -26,6 +26,7 @@ struct GardenView: View {
     @State private var spriteIsMoving = false
     @State private var spriteTapReaction: String? = nil
     @State private var petPositions: [UUID: CGPoint] = [:]
+    @State private var petDragStart: [UUID: CGPoint] = [:]
     @State private var petIsDragging: [UUID: Bool] = [:]
     @State private var petWanderJob: [UUID: Bool] = [:]
     private let cooldownTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
@@ -134,31 +135,28 @@ struct GardenView: View {
             }
 
             ForEach(pets.filter { $0.isOwned }) { pet in
-                let pos = petPositions[pet.id] ?? CGPoint(
-                    x: geo.size.width * 0.28,
-                    y: geo.size.height * 0.58
-                )
                 AnimatedPetView(petType: pet.petType, isHappy: pet.friendshipLevel > 0.5)
                     .frame(width: 48, height: 48)
-                    .position(pos)
+                    .position(petPositions[pet.id] ?? CGPoint(x: geo.size.width * 0.28, y: geo.size.height * 0.58))
                     .gesture(
-                        DragGesture(coordinateSpace: .local)
+                        DragGesture(coordinateSpace: .global)
                             .onChanged { value in
                                 if petIsDragging[pet.id] != true {
                                     petIsDragging[pet.id] = true
                                     petWanderJob[pet.id] = false
+                                    petDragStart[pet.id] = petPositions[pet.id] ?? CGPoint(x: geo.size.width * 0.28, y: geo.size.height * 0.58)
                                     UIImpactFeedbackGenerator(style: .light).impactOccurred()
                                 }
-                                let newX = pos.x + value.translation.width
-                                let newY = pos.y + value.translation.height
+                                let start = petDragStart[pet.id] ?? value.startLocation
                                 petPositions[pet.id] = CGPoint(
-                                    x: min(max(24, newX), geo.size.width - 24),
-                                    y: min(max(24, newY), geo.size.height - 24)
+                                    x: min(max(24, start.x + value.translation.width), geo.size.width - 24),
+                                    y: min(max(24, start.y + value.translation.height), geo.size.height - 24)
                                 )
                             }
                             .onEnded { _ in
                                 UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                                 petIsDragging[pet.id] = false
+                                petDragStart[pet.id] = nil
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
                                     petWanderJob[pet.id] = true
                                     wanderPet(pet: pet, geo: geo)

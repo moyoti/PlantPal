@@ -32,6 +32,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.plantpal.data.entity.PlantEntity
@@ -256,17 +257,15 @@ private fun FullscreenScene(
             val view = LocalView.current
             var isDragging by remember { mutableStateOf(false) }
             var isWandering by remember { mutableStateOf(true) }
-            var petX by remember(pet.id) { mutableFloatStateOf(-88f - index * 40f) }
-            var petY by remember(pet.id) { mutableFloatStateOf(-32f) }
-            var containerWidth by remember { mutableFloatStateOf(0f) }
-            var containerHeight by remember { mutableFloatStateOf(0f) }
+            var petOffsetX by remember(pet.id) { mutableFloatStateOf(-88f - index * 40f) }
+            var petOffsetY by remember(pet.id) { mutableFloatStateOf(-32f) }
 
             LaunchedEffect(pet.id, isWandering) {
                 if (isWandering) {
                     while (true) {
                         delay(Random.nextLong(3000, 6000))
-                        petX += Random.nextFloat() * 30f - 15f
-                        petY += Random.nextFloat() * 10f - 5f
+                        petOffsetX += Random.nextFloat() * 30f - 15f
+                        petOffsetY += Random.nextFloat() * 10f - 5f
                     }
                 }
             }
@@ -276,11 +275,7 @@ private fun FullscreenScene(
                 isHappy = pet.friendshipLevel > 0.5,
                 modifier = Modifier
                     .size(if (isDragging) 58.dp else 48.dp)
-                    .offset(x = petX.dp, y = petY.dp)
-                    .onSizeChanged { size ->
-                        containerWidth = size.width.toFloat()
-                        containerHeight = size.height.toFloat()
-                    }
+                    .offset { IntOffset(petOffsetX.dp.roundToPx(), petOffsetY.dp.roundToPx()) }
                     .pointerInput(Unit) {
                         detectDragGestures(
                             onDragStart = {
@@ -294,8 +289,10 @@ private fun FullscreenScene(
                             },
                             onDrag = { change, dragAmount ->
                                 change.consume()
-                                petX += dragAmount.x / density
-                                petY += dragAmount.y / density
+                                val dpX = dragAmount.x / density
+                                val dpY = dragAmount.y / density
+                                petOffsetX += dpX
+                                petOffsetY += dpY
                             },
                             onDragEnd = {
                                 isDragging = false
